@@ -165,6 +165,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // функция для отображения статистики пользователя
   function displayUserStats(stats) {
+    // Определяем собственный идентификатор пользователя (обычно "Me" или имя аккаунта)
+    // TikTok обычно использует "Me" для обозначения собственных сообщений
+    const myMessageAuthor = Object.keys(stats.messagesByAuthor).find(
+      (author) => author !== stats.userId && author !== "TikTok"
+    );
+
+    // Количество сообщений от пользователя
+    const myMessages = stats.messagesByAuthor[myMessageAuthor] || 0;
+
     // общая статистика в виде сетки 4х2
     const generalStatsHtml = `
       <div class="stats-grid">
@@ -190,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="stat-item">
           <div class="stat-label">Моих сообщений</div>
-          <div class="stat-value">${stats.messagesByAuthor["You"] || 0}</div>
+          <div class="stat-value">${myMessages}</div>
         </div>
         <div class="stat-item">
           <div class="stat-label">Сообщений собеседника</div>
