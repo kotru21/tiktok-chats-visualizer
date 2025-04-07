@@ -72,7 +72,6 @@ npm start
 
 ## 🧩 Структура проекта
 ```
-tiktok-data-visualizer/
 ├── chat-analyzer/
 │ ├── public/
 │ │ ├── css/
