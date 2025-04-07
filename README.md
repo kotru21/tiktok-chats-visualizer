@@ -1,6 +1,6 @@
 # TikTok Data Visualizer
 
-![Приложение](https://github.com/user-attachments/assets/80698d91-97e9-4cae-9177-3dbff2292d07)
+![Приложение](https://github.com/user-attachments/assets/f4674196-f87d-4703-be37-3b089fae5d06)
 
 ## 📱 О проекте
 
