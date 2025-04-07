@@ -173,6 +173,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${stats.totalMessages}</td>
                 </tr>
                 <tr>
+                    <th>Период переписки</th>
+                    <td>${stats.chatPeriod.firstDate} — ${stats.chatPeriod.lastDate}</td>
+                </tr>
+                <tr>
+                    <th>Продолжительность</th>
+                    <td>${stats.chatPeriod.totalDays} дн.</td>
+                </tr>
+                <tr>
                     <th>Среднее количество сообщений в день</th>
                     <td>${stats.avgMessagesPerDay}</td>
                 </tr>

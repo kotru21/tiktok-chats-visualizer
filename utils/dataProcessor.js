@@ -145,15 +145,26 @@ function generateUserStats(chatData, userId) {
 
   // Расчет полного периода переписки в днях, включая дни без сообщений
   let totalDays = 0;
+  let firstDate = null;
+  let lastDate = null;
+
   if (userChat.messages.length > 0) {
     // временной интервал между первым и последним сообщением
     const timestamps = userChat.messages.map((msg) => new Date(msg.timestamp));
-    const firstDate = new Date(Math.min(...timestamps));
-    const lastDate = new Date(Math.max(...timestamps));
+    firstDate = new Date(Math.min(...timestamps));
+    lastDate = new Date(Math.max(...timestamps));
 
     //  разница в днях, включая начальный день
     totalDays = Math.floor((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
   }
+
+  // Форматирование дат для отображения
+  const firstDateFormatted = firstDate
+    ? moment(firstDate).format("DD.MM.YYYY")
+    : "Н/Д";
+  const lastDateFormatted = lastDate
+    ? moment(lastDate).format("DD.MM.YYYY")
+    : "Н/Д";
 
   // Среднее количество сообщений в день за весь период переписки
   const avgMessagesPerDay =
@@ -166,6 +177,11 @@ function generateUserStats(chatData, userId) {
     frequentWords, // Наиболее часто используемые слова
     dateStats, // Статистика по датам
     avgMessagesPerDay: Math.round(avgMessagesPerDay * 100) / 100, // Среднее число сообщений в день (округленное)
+    chatPeriod: {
+      firstDate: firstDateFormatted,
+      lastDate: lastDateFormatted,
+      totalDays,
+    },
   };
 }
 
