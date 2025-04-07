@@ -1,26 +1,95 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Инициализация приложения
-  loadUsers();
+  // настройка обработчиков загрузки файла
+  setupFileUpload();
   setupEventListeners();
 
-  // Функция для загрузки списка пользователей
+  // функция для настройки загрузки файла
+  function setupFileUpload() {
+    const uploadForm = document.getElementById("upload-form");
+    const chatFileInput = document.getElementById("chat-file");
+    const uploadStatus = document.getElementById("upload-status");
+    const fileText = document.querySelector(".file-text");
+
+    // отображение имени выбранного файла
+    chatFileInput.addEventListener("change", () => {
+      if (chatFileInput.files.length > 0) {
+        fileText.textContent = chatFileInput.files[0].name;
+      } else {
+        fileText.textContent = "Выберите JSON файл";
+      }
+    });
+
+    // обработка отправки формы
+    uploadForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!chatFileInput.files[0]) {
+        uploadStatus.className = "upload-status status-error";
+        uploadStatus.textContent = "Пожалуйста, выберите файл";
+        return;
+      }
+
+      // отображение статуса загрузки
+      uploadStatus.className = "upload-status status-loading";
+      uploadStatus.innerHTML =
+        '<div class="spinner"></div><span>Загрузка файла...</span>';
+
+      // подготовка данных для отправки
+      const formData = new FormData();
+      formData.append("chatFile", chatFileInput.files[0]);
+
+      try {
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Ошибка при загрузке файла");
+        }
+
+        // отображение успешного сообщения
+        uploadStatus.className = "upload-status status-success";
+        uploadStatus.textContent = `Файл успешно загружен! Найдено ${result.count} чатов.`;
+
+        // скрытие формы загрузки
+        document.getElementById("upload-container").classList.add("hidden");
+
+        // загрузка списка пользователей
+        loadUsers();
+      } catch (error) {
+        console.error("Ошибка:", error);
+        uploadStatus.className = "upload-status status-error";
+        uploadStatus.textContent = error.message || "Ошибка при загрузке файла";
+      }
+    });
+  }
+
+  // функция для загрузки списка пользователей
   async function loadUsers() {
     try {
       const response = await fetch("/api/users");
       if (!response.ok) {
-        throw new Error("Ошибка при загрузке пользователей");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Ошибка при загрузке пользователей");
       }
 
       const users = await response.json();
       displayUsers(users);
+
+      // отображение сайдбара после успешной загрузки
+      document.getElementById("sidebar").classList.add("active");
     } catch (error) {
       console.error("Ошибка:", error);
-      document.getElementById("userList").innerHTML =
-        '<div class="error">Ошибка при загрузке пользователей. Пожалуйста, попробуйте позже.</div>';
+      document.getElementById("userList").innerHTML = `<div class="error">${
+        error.message || "Ошибка при загрузке пользователей"
+      }</div>`;
     }
   }
 
-  // Функция для отображения списка пользователей
+  // функция для отображения списка пользователей
   function displayUsers(users) {
     const userListElement = document.getElementById("userList");
 
@@ -43,33 +112,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     userListElement.innerHTML = userItems;
 
-    // Добавляем обработчики событий для пользователей
+    // добавление обработчиков событий для пользователей
     document.querySelectorAll(".user-item").forEach((item) => {
       item.addEventListener("click", function () {
-        // Удаляем активный класс у всех элементов
+        // удаление активного класса у всех элементов
         document
           .querySelectorAll(".user-item")
           .forEach((el) => el.classList.remove("active"));
 
-        // Добавляем активный класс к выбранному элементу
+        // добавление активного класса к выбранному элементу
         this.classList.add("active");
 
-        // Загружаем статистику для выбранного пользователя
+        // загрузка статистики для выбранного пользователя
         const userId = this.getAttribute("data-user-id");
         loadUserStats(userId);
       });
     });
   }
 
-  // Функция для загрузки статистики пользователя
+  // функция для загрузки статистики пользователя
   async function loadUserStats(userId) {
     try {
-      // Показываем информацию о загрузке
+      // отображение информации о загрузке
       document.getElementById("welcome-message").style.display = "none";
       document.getElementById("user-stats").style.display = "block";
       document.getElementById("user-name").textContent = userId;
 
-      // Очищаем предыдущие данные
+      // очистка предыдущих данных
       document.getElementById("general-stats").innerHTML =
         '<div class="loading">Загрузка статистики...</div>';
       document.getElementById("messages-by-author").innerHTML =
@@ -79,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("date-activity").innerHTML =
         '<canvas id="date-chart"></canvas><div class="loading">Загрузка...</div>';
 
-      // Загружаем статистику
+      // загрузка статистики
       const response = await fetch(`/api/users/${userId}/stats`);
       if (!response.ok) {
         throw new Error("Ошибка при загрузке статистики");
@@ -94,9 +163,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Функция для отображения статистики пользователя
+  // функция для отображения статистики пользователя
   function displayUserStats(stats) {
-    // Общая статистика
+    // общая статистика
     const generalStatsHtml = `
             <table>
                 <tr>
@@ -111,15 +180,15 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     document.getElementById("general-stats").innerHTML = generalStatsHtml;
 
-    // Визуализируем статистику на графиках с помощью Chart.js
+    // визуализация статистики на графиках с помощью Chart.js
     createAuthorChart("author-chart", stats.messagesByAuthor);
     createWordsChart("words-chart", stats.frequentWords);
     createDateChart("date-chart", stats.dateStats);
   }
 
-  // Настройка обработчиков событий
+  // настройка обработчиков событий
   function setupEventListeners() {
-    // Мобильное меню
+    // мобильное меню
     const sidebarToggle = document.getElementById("sidebar-toggle");
     const sidebar = document.getElementById("sidebar");
 
@@ -129,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Кнопка "Назад" на мобильных устройствах
+    // кнопка "Назад" на мобильных устройствах
     const backButton = document.getElementById("back-to-list");
     if (backButton) {
       backButton.addEventListener("click", () => {
@@ -139,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Закрытие сайдбара при клике на основной контент на мобильных
+    // закрытие сайдбара при клике на основной контент на мобильных
     const mainContent = document.querySelector(".main-content");
     if (mainContent) {
       mainContent.addEventListener("click", () => {
@@ -149,14 +218,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Поиск по пользователям
+    // поиск по пользователям
     const searchInput = document.getElementById("user-search");
     if (searchInput) {
       searchInput.addEventListener("input", filterUsers);
     }
   }
 
-  // Фильтрация пользователей при поиске
+  // фильтрация пользователей при поиске
   function filterUsers() {
     const searchInput = document.getElementById("user-search");
     const searchTerm = searchInput.value.toLowerCase();

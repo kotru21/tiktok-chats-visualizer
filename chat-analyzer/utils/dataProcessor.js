@@ -41,10 +41,8 @@ function generateUserStats(chatData, userId) {
     return null;
   }
 
-  // Собираем количество сообщений от каждого участника чата
   const messagesByAuthor = _.countBy(userChat.messages, "from");
 
-  // Анализ часто используемых слов с корректной обработкой предложений и очисткой от знаков препинания
   const words = {};
 
   // Список стоп-слов (низкоинформативных слов, которые можно исключить из анализа)
@@ -67,7 +65,6 @@ function generateUserStats(chatData, userId) {
 
     let text = msg.text;
 
-    // Удаляем все URL более надежно
     text = text
       .replace(/https?:\/\/[^\s]+/g, "")
       .replace(/www\.[^\s]+/g, "")
@@ -75,14 +72,14 @@ function generateUserStats(chatData, userId) {
 
     if (text.trim() === "") return;
 
-    // Более полная очистка текста от знаков препинания и символов
+    // очистка текста от знаков препинания и символов
     text = text
       .toLowerCase()
       .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()"""''«»\[\]]/g, " ")
       .replace(/\s+/g, " ")
       .trim();
 
-    // Разбиваем на слова
+    // разбивка приложения на слова
     const msgWords = text.split(" ");
 
     // Дополнительные стоп-слова для русского языка
@@ -108,42 +105,40 @@ function generateUserStats(chatData, userId) {
     const allStopWords = [...stopWords, ...additionalStopWords];
 
     msgWords.forEach((word) => {
-      // Улучшенная фильтрация слов
+      //  фильтрация слов
       if (
         word &&
         word.length > 3 &&
         !allStopWords.includes(word) &&
-        !word.includes(".") && // Исключаем все части URL с точками
-        !/^\d+$/.test(word) // Исключаем числа
+        !word.includes(".") &&
+        !/^\d+$/.test(word)
       ) {
         words[word] = (words[word] || 0) + 1;
       }
     });
   });
 
-  // Определяем топ-20 наиболее часто используемых слов
+  //  топ-20 наиболее часто используемых слов
   const frequentWords = Object.entries(words)
-    // Проверяем количество уникальных слов
+
     .sort((a, b) => b[1] - a[1])
-    // Если слов больше 20, фильтруем редкие
-    // Если слов мало, не фильтруем, чтобы показать хоть что-то
+
     .filter(([word, count]) => {
       if (Object.keys(words).length >= 20) {
-        return count > 1; // Для больших чатов фильтруем редкие слова
+        return count > 1;
       }
-      return true; // Для маленьких чатов показываем все слова
+      return true;
     })
-    .slice(0, 20) // Топ-20 слов
+    .slice(0, 20)
     .map(([word, count]) => ({ word, count }));
 
-  // Группируем сообщения по датам для анализа активности
+  //  сообщения по датам для анализа активности
   const messagesByDate = {};
   userChat.messages.forEach((msg) => {
     const date = moment(msg.timestamp).format("YYYY-MM-DD");
     messagesByDate[date] = (messagesByDate[date] || 0) + 1;
   });
 
-  // Преобразуем данные по датам в формат для построения графиков
   const dateStats = Object.entries(messagesByDate)
     .map(([date, count]) => ({ date, count }))
     .sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -151,12 +146,12 @@ function generateUserStats(chatData, userId) {
   // Расчет полного периода переписки в днях, включая дни без сообщений
   let totalDays = 0;
   if (userChat.messages.length > 0) {
-    // Определяем временной интервал между первым и последним сообщением
+    // временной интервал между первым и последним сообщением
     const timestamps = userChat.messages.map((msg) => new Date(msg.timestamp));
     const firstDate = new Date(Math.min(...timestamps));
     const lastDate = new Date(Math.max(...timestamps));
 
-    // Вычисляем разницу в днях, включая начальный день
+    //  разница в днях, включая начальный день
     totalDays = Math.floor((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
   }
 
@@ -174,7 +169,6 @@ function generateUserStats(chatData, userId) {
   };
 }
 
-// Экспорт функций для использования в других модулях
 module.exports = {
   extractUsers,
   generateUserStats,

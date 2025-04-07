@@ -47,6 +47,33 @@
         <!-- Приветственный экран -->
         <div id="welcome-message" class="welcome-screen">
           <div class="welcome-content">
+            <div id="upload-container" class="upload-container">
+              <h2>Загрузите ваш файл данных TikTok</h2>
+              <p class="upload-info">
+                Для анализа необходим файл JSON, полученный из запроса на
+                выгрузку данных в TikTok. Все данные обрабатываются только в
+                вашем браузере и не сохраняются на сервере.
+              </p>
+              <form id="upload-form" enctype="multipart/form-data">
+                <div class="file-input-container">
+                  <input
+                    type="file"
+                    id="chat-file"
+                    name="chatFile"
+                    accept=".json"
+                    required />
+                  <label for="chat-file" class="file-label">
+                    <span class="file-icon">📁</span>
+                    <span class="file-text">Выберите JSON файл</span>
+                  </label>
+                </div>
+                <button type="submit" class="upload-button">
+                  <span class="button-icon">📊</span>
+                  Загрузить и анализировать
+                </button>
+              </form>
+              <div id="upload-status" class="upload-status"></div>
+            </div>
             <svg
               class="welcome-icon"
               xmlns="http://www.w3.org/2000/svg"

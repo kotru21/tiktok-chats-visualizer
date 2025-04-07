@@ -1,9 +1,7 @@
-// Создает график распределения сообщений по авторам
 function createAuthorChart(canvasId, data) {
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext("2d");
 
-  // Очищаем предыдущие загрузочные сообщения
   const parent = canvas.parentNode;
   const loaders = parent.querySelectorAll(".loading");
   loaders.forEach((loader) => loader.remove());
@@ -46,20 +44,16 @@ function createWordsChart(canvasId, data) {
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext("2d");
 
-  // Очищаем предыдущие загрузочные сообщения
   const parent = canvas.parentNode;
   const loaders = parent.querySelectorAll(".loading");
   loaders.forEach((loader) => loader.remove());
 
-  // Проверяем, есть ли данные для отображения
   if (!data || data.length === 0) {
-    // Если данных нет, показываем сообщение
     parent.innerHTML =
       '<div class="no-data">Недостаточно данных для анализа слов</div>';
     return;
   }
 
-  // Берем топ-10 слов для лучшей читаемости
   const top10Words = data.slice(0, 10);
 
   const labels = top10Words.map((item) => item.word);
@@ -97,12 +91,11 @@ function createWordsChart(canvasId, data) {
   });
 }
 
-// Создает график активности по датам
+//  график активности по датам
 function createDateChart(canvasId, data) {
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext("2d");
 
-  // Очищаем предыдущие загрузочные сообщения
   const parent = canvas.parentNode;
   const loaders = parent.querySelectorAll(".loading");
   loaders.forEach((loader) => loader.remove());

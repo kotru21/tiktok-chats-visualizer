@@ -458,3 +458,106 @@ th {
     margin-top: 8px;
   }
 }
+
+/* Стили для формы загрузки */
+.upload-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.upload-info {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.file-input-container {
+  margin-bottom: 20px;
+}
+
+input[type="file"] {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #e9ecef;
+  border: 2px dashed #adb5bd;
+  border-radius: 5px;
+  color: #495057;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.file-label:hover {
+  background-color: #dee2e6;
+  border-color: #4a6fa5;
+}
+
+.file-icon {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.upload-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 20px;
+  background-color: #4a6fa5;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-button:hover {
+  background-color: #3a5a8a;
+}
+
+.button-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.upload-status {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.status-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden {
+  display: none !important;
+}
