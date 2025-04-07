@@ -1,0 +1,21 @@
+{
+  "name": "chat-analyzer",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "chart.js": "^4.4.8",
+    "express": "^5.1.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
+    "stream-chain": "^3.4.0",
+    "stream-json": "^1.9.1"
+  }
+}

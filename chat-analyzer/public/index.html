@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Анализатор чатов TikTok</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Мобильная навигация -->
+      <div class="mobile-header">
+        <h1>Анализатор чатов</h1>
+        <button id="sidebar-toggle" aria-label="Открыть список пользователей">
+          <span class="hamburger"></span>
+        </button>
+      </div>
+
+      <!-- Боковая панель с пользователями -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <h2>Пользователи</h2>
+          <div class="search-container">
+            <input
+              type="text"
+              id="user-search"
+              placeholder="Поиск..."
+              aria-label="Поиск пользователей" />
+          </div>
+        </div>
+        <div class="user-list" id="userList">
+          <!-- Список пользователей будет загружен с сервера -->
+          <div class="loading">
+            <div class="spinner"></div>
+            <span>Загрузка пользователей...</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Основной контент -->
+      <main class="main-content">
+        <!-- Приветственный экран -->
+        <div id="welcome-message" class="welcome-screen">
+          <div class="welcome-content">
+            <svg
+              class="welcome-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="80"
+              height="80">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"
+                fill="currentColor" />
+            </svg>
+            <h2>Добро пожаловать в Анализатор чатов!</h2>
+            <p>
+              Выберите пользователя из списка слева, чтобы увидеть подробную
+              статистику вашего общения.
+            </p>
+            <p class="welcome-tip">Вы сможете узнать:</p>
+            <ul class="welcome-features">
+              <li>Общее количество и среднее число сообщений</li>
+              <li>Распределение сообщений между участниками</li>
+              <li>Наиболее часто используемые слова</li>
+              <li>Активность общения по дням</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Статистика пользователя -->
+        <div id="user-stats" class="user-stats" style="display: none">
+          <div class="user-stats-header">
+            <h2>
+              Статистика общения с
+              <span id="user-name" class="highlight"></span>
+            </h2>
+            <button
+              id="back-to-list"
+              class="mobile-only back-button"
+              aria-label="Вернуться к списку">
+              ← К списку пользователей
+            </button>
+          </div>
+
+          <div class="stats-cards">
+            <!-- Общая статистика -->
+            <div class="stat-card">
+              <div class="card-header">
+                <h3>Общая статистика</h3>
+                <span class="card-icon">📊</span>
+              </div>
+              <div id="general-stats" class="card-content">
+                <div class="skeleton"></div>
+              </div>
+            </div>
+
+            <!-- Сообщения по авторам -->
+            <div class="stat-card">
+              <div class="card-header">
+                <h3>Сообщения по авторам</h3>
+                <span class="card-icon">👥</span>
+              </div>
+              <div id="messages-by-author" class="card-content chart-container">
+                <canvas id="author-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- Частые слова -->
+            <div class="stat-card">
+              <div class="card-header">
+                <h3>Часто используемые слова</h3>
+                <span class="card-icon">🔤</span>
+              </div>
+              <div id="frequent-words" class="card-content chart-container">
+                <canvas id="words-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- Активность по датам -->
+            <div class="stat-card">
+              <div class="card-header">
+                <h3>Активность по датам</h3>
+                <span class="card-icon">📅</span>
+              </div>
+              <div id="date-activity" class="card-content chart-container">
+                <canvas id="date-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
