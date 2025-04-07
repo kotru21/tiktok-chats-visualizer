@@ -165,28 +165,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // функция для отображения статистики пользователя
   function displayUserStats(stats) {
-    // общая статистика
+    // общая статистика в виде сетки 4х2
     const generalStatsHtml = `
-            <table>
-                <tr>
-                    <th>Всего сообщений</th>
-                    <td>${stats.totalMessages}</td>
-                </tr>
-                <tr>
-                    <th>Период переписки</th>
-                    <td>${stats.chatPeriod.firstDate} — ${stats.chatPeriod.lastDate}</td>
-                </tr>
-                <tr>
-                    <th>Продолжительность</th>
-                    <td>${stats.chatPeriod.totalDays} дн.</td>
-                </tr>
-                <tr>
-                    <th>Среднее количество сообщений в день</th>
-                    <td>${stats.avgMessagesPerDay}</td>
-                </tr>
-            </table>
-        `;
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">Всего сообщений</div>
+          <div class="stat-value">${stats.totalMessages}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Начало переписки</div>
+          <div class="stat-value">${stats.chatPeriod.firstDate}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Конец переписки</div>
+          <div class="stat-value">${stats.chatPeriod.lastDate}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Продолжительность</div>
+          <div class="stat-value">${stats.chatPeriod.totalDays} дн.</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Сообщений в день</div>
+          <div class="stat-value">${stats.avgMessagesPerDay}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Моих сообщений</div>
+          <div class="stat-value">${stats.messagesByAuthor["You"] || 0}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Сообщений собеседника</div>
+          <div class="stat-value">${
+            stats.messagesByAuthor[stats.userId] || 0
+          }</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Активных дней</div>
+          <div class="stat-value">${stats.dateStats.length}</div>
+        </div>
+      </div>
+    `;
     document.getElementById("general-stats").innerHTML = generalStatsHtml;
+
+    // добавляем класс full-width-card к первой карточке
+    document.querySelector(".stat-card").classList.add("full-width-card");
 
     // визуализация статистики на графиках с помощью Chart.js
     createAuthorChart("author-chart", stats.messagesByAuthor);
