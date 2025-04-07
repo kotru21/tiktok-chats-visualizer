@@ -71,7 +71,7 @@ npm start
    - Просмотрите подробную статистику общения
 
 ## 🧩 Структура проекта
-
+```
 tiktok-data-visualizer/
 ├── chat-analyzer/
 │ ├── public/
@@ -81,3 +81,4 @@ tiktok-data-visualizer/
 │ ├── server.js
 │ └── package.json
 └── README.md
+```
