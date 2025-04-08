@@ -131,5 +131,5 @@ app.get("/api/users/:userId/stats", checkSessionData, (req, res) => {
 
 // Запуск сервера
 app.listen(PORT, () => {
-  console.log(`Сервер запущен на порту ${PORT}`);
+  console.log(`Сервер запущен на порту ${PORT}: http://localhost:${PORT}`);
 });
