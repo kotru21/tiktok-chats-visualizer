@@ -1,3 +1,16 @@
+// Вспомогательная функция для получения цветовой схемы графиков
+function getChartColorScheme() {
+  const isDarkMode =
+    window.matchMedia("(prefers-color-scheme: dark)").matches ||
+    document.body.classList.contains("dark-theme");
+
+  return {
+    fontColor: isDarkMode ? "#e1e1e1" : "#333",
+    gridColor: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+    backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
+  };
+}
+
 function createAuthorChart(canvasId, data) {
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext("2d");
@@ -8,6 +21,7 @@ function createAuthorChart(canvasId, data) {
 
   const labels = Object.keys(data);
   const values = Object.values(data);
+  const colorScheme = getChartColorScheme();
 
   new Chart(ctx, {
     type: "pie",
@@ -33,6 +47,9 @@ function createAuthorChart(canvasId, data) {
       plugins: {
         legend: {
           position: "right",
+          labels: {
+            color: colorScheme.fontColor,
+          },
         },
       },
     },
@@ -57,6 +74,7 @@ function createWordsChart(canvasId, data) {
 
   const labels = top10Words.map((item) => item.word);
   const values = top10Words.map((item) => item.count);
+  const colorScheme = getChartColorScheme();
 
   new Chart(ctx, {
     type: "bar",
@@ -78,11 +96,28 @@ function createWordsChart(canvasId, data) {
       scales: {
         y: {
           beginAtZero: true,
+          ticks: {
+            color: colorScheme.fontColor,
+          },
+          grid: {
+            color: colorScheme.gridColor,
+          },
         },
         x: {
           beginAtZero: true,
           ticks: {
             precision: 0,
+            color: colorScheme.fontColor,
+          },
+          grid: {
+            color: colorScheme.gridColor,
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: colorScheme.fontColor,
           },
         },
       },
@@ -101,6 +136,7 @@ function createDateChart(canvasId, data) {
 
   const labels = data.map((item) => item.date);
   const values = data.map((item) => item.count);
+  const colorScheme = getChartColorScheme();
 
   new Chart(ctx, {
     type: "line",
@@ -126,6 +162,17 @@ function createDateChart(canvasId, data) {
           beginAtZero: true,
           ticks: {
             precision: 0,
+            color: colorScheme.fontColor,
+          },
+          grid: {
+            color: colorScheme.gridColor,
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: colorScheme.fontColor,
           },
         },
       },
@@ -152,6 +199,7 @@ function createWordPairsChart(canvasId, data) {
 
   const labels = top10Pairs.map((item) => item.pair);
   const values = top10Pairs.map((item) => item.count);
+  const colorScheme = getChartColorScheme();
 
   new Chart(ctx, {
     type: "bar",
@@ -173,11 +221,28 @@ function createWordPairsChart(canvasId, data) {
       scales: {
         y: {
           beginAtZero: true,
+          ticks: {
+            color: colorScheme.fontColor,
+          },
+          grid: {
+            color: colorScheme.gridColor,
+          },
         },
         x: {
           beginAtZero: true,
           ticks: {
             precision: 0,
+            color: colorScheme.fontColor,
+          },
+          grid: {
+            color: colorScheme.gridColor,
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: colorScheme.fontColor,
           },
         },
       },
@@ -207,6 +272,7 @@ function createWeekdayChart(canvasId, data) {
 
   const labels = weekdayOrder;
   const values = weekdayOrder.map((day) => data[day] || 0);
+  const colorScheme = getChartColorScheme();
 
   new Chart(ctx, {
     type: "bar",
@@ -229,6 +295,17 @@ function createWeekdayChart(canvasId, data) {
           beginAtZero: true,
           ticks: {
             precision: 0,
+            color: colorScheme.fontColor,
+          },
+          grid: {
+            color: colorScheme.gridColor,
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: colorScheme.fontColor,
           },
         },
       },
@@ -263,6 +340,7 @@ function createTimeOfDayChart(canvasId, data) {
     "#6c5ce7", // вечер - фиолетовый
     "#2d3436", // ночь - темно-серый
   ];
+  const colorScheme = getChartColorScheme();
 
   new Chart(ctx, {
     type: "pie",
@@ -282,6 +360,9 @@ function createTimeOfDayChart(canvasId, data) {
       plugins: {
         legend: {
           position: "right",
+          labels: {
+            color: colorScheme.fontColor,
+          },
         },
       },
     },
