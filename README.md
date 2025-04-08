@@ -44,6 +44,7 @@ Tiktok Chats Visualizer - это веб-приложение для анализ
 git clone https://github.com/your-username/tiktok-chats-visualizer.git
 cd tiktok-chats-visualizer/chat-analyzer
 ```
+<i>либо скачайте код с GitHub</i>
 
 2. Установите зависимости:
 
