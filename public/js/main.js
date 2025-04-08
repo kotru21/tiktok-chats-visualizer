@@ -147,6 +147,10 @@ document.addEventListener("DOMContentLoaded", () => {
         '<canvas id="words-chart"></canvas><div class="loading">Загрузка...</div>';
       document.getElementById("date-activity").innerHTML =
         '<canvas id="date-chart"></canvas><div class="loading">Загрузка...</div>';
+      document.getElementById("weekday-activity").innerHTML =
+        '<canvas id="weekday-chart"></canvas><div class="loading">Загрузка...</div>';
+      document.getElementById("time-of-day-activity").innerHTML =
+        '<canvas id="time-of-day-chart"></canvas><div class="loading">Загрузка...</div>';
 
       // загрузка статистики
       const response = await fetch(`/api/users/${userId}/stats`);
@@ -221,12 +225,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // очистка предыдущих данных для новой диаграммы
     document.getElementById("frequent-pairs").innerHTML =
       '<canvas id="pairs-chart"></canvas><div class="loading">Загрузка...</div>';
+    document.getElementById("weekday-activity").innerHTML =
+      '<canvas id="weekday-chart"></canvas><div class="loading">Загрузка...</div>';
+    document.getElementById("time-of-day-activity").innerHTML =
+      '<canvas id="time-of-day-chart"></canvas><div class="loading">Загрузка...</div>';
 
     // визуализация статистики на графиках с помощью Chart.js
     createAuthorChart("author-chart", stats.messagesByAuthor);
     createWordsChart("words-chart", stats.frequentWords);
     createWordPairsChart("pairs-chart", stats.frequentWordPairs);
     createDateChart("date-chart", stats.dateStats);
+    createWeekdayChart("weekday-chart", stats.messagesByWeekday);
+    createTimeOfDayChart("time-of-day-chart", stats.messagesByTimeOfDay);
   }
 
   // настройка обработчиков событий

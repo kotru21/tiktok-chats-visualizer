@@ -46,6 +46,25 @@ function generateUserStats(chatData, userId) {
   const words = {};
   const wordPairs = {}; // Для хранения частых сочетаний слов
 
+  // Анализ по дням недели
+  const messagesByWeekday = {
+    Понедельник: 0,
+    Вторник: 0,
+    Среда: 0,
+    Четверг: 0,
+    Пятница: 0,
+    Суббота: 0,
+    Воскресенье: 0,
+  };
+
+  // Анализ по времени суток
+  const messagesByTimeOfDay = {
+    "Утро (6:00-12:00)": 0,
+    "День (12:00-18:00)": 0,
+    "Вечер (18:00-00:00)": 0,
+    "Ночь (00:00-6:00)": 0,
+  };
+
   // Список стоп-слов (низкоинформативных слов, которые можно исключить из анализа)
   const stopWords = [
     "это",
@@ -86,6 +105,32 @@ function generateUserStats(chatData, userId) {
 
   userChat.messages.forEach((msg) => {
     if (!msg.text) return;
+
+    // Анализ дня недели и времени суток
+    const date = new Date(msg.timestamp);
+    const weekday = date.getDay(); // 0 - воскресенье, 1 - понедельник и т.д.
+    const weekdayNames = [
+      "Воскресенье",
+      "Понедельник",
+      "Вторник",
+      "Среда",
+      "Четверг",
+      "Пятница",
+      "Суббота",
+    ];
+    messagesByWeekday[weekdayNames[weekday]]++;
+
+    // Анализ по времени суток
+    const hour = date.getHours();
+    if (hour >= 6 && hour < 12) {
+      messagesByTimeOfDay["Утро (6:00-12:00)"]++;
+    } else if (hour >= 12 && hour < 18) {
+      messagesByTimeOfDay["День (12:00-18:00)"]++;
+    } else if (hour >= 18 && hour < 24) {
+      messagesByTimeOfDay["Вечер (18:00-00:00)"]++;
+    } else {
+      messagesByTimeOfDay["Ночь (00:00-6:00)"]++;
+    }
 
     let text = msg.text;
 
@@ -194,6 +239,8 @@ function generateUserStats(chatData, userId) {
     frequentWords, // Наиболее часто используемые слова
     frequentWordPairs, // Наиболее часто встречающиеся сочетания слов
     dateStats, // Статистика по датам
+    messagesByWeekday, // Статистика по дням недели
+    messagesByTimeOfDay, // Статистика по времени суток
     avgMessagesPerDay: Math.round(avgMessagesPerDay * 100) / 100, // Среднее число сообщений в день (округленное)
     chatPeriod: {
       firstDate: firstDateFormatted,
