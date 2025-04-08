@@ -44,6 +44,7 @@ function generateUserStats(chatData, userId) {
   const messagesByAuthor = _.countBy(userChat.messages, "from");
 
   const words = {};
+  const wordPairs = {}; // Для хранения частых сочетаний слов
 
   // Список стоп-слов (низкоинформативных слов, которые можно исключить из анализа)
   const stopWords = [
@@ -59,6 +60,29 @@ function generateUserStats(chatData, userId) {
     "они",
     "оно",
   ];
+
+  // Дополнительные стоп-слова для русского языка
+  const additionalStopWords = [
+    "есть",
+    "быть",
+    "просто",
+    "тоже",
+    "только",
+    "меня",
+    "тебя",
+    "себя",
+    "свой",
+    "наш",
+    "ваш",
+    "этот",
+    "тот",
+    "такой",
+    "который",
+    "когда",
+    "если",
+  ];
+
+  const allStopWords = [...stopWords, ...additionalStopWords];
 
   userChat.messages.forEach((msg) => {
     if (!msg.text) return;
@@ -82,47 +106,33 @@ function generateUserStats(chatData, userId) {
     // разбивка приложения на слова
     const msgWords = text.split(" ");
 
-    // Дополнительные стоп-слова для русского языка
-    const additionalStopWords = [
-      "есть",
-      "быть",
-      "просто",
-      "тоже",
-      "только",
-      "меня",
-      "тебя",
-      "себя",
-      "свой",
-      "наш",
-      "ваш",
-      "этот",
-      "тот",
-      "такой",
-      "который",
-      "когда",
-      "если",
-    ];
-    const allStopWords = [...stopWords, ...additionalStopWords];
-
-    msgWords.forEach((word) => {
-      //  фильтрация слов
-      if (
+    // Фильтрация слов от стоп-слов и коротких слов
+    const filteredWords = msgWords.filter(
+      (word) =>
         word &&
         word.length > 3 &&
         !allStopWords.includes(word) &&
         !word.includes(".") &&
         !/^\d+$/.test(word)
-      ) {
-        words[word] = (words[word] || 0) + 1;
-      }
+    );
+
+    // Обработка отдельных слов
+    filteredWords.forEach((word) => {
+      words[word] = (words[word] || 0) + 1;
     });
+
+    // Обработка пар слов (биграмм)
+    if (filteredWords.length > 1) {
+      for (let i = 0; i < filteredWords.length - 1; i++) {
+        const pair = `${filteredWords[i]} ${filteredWords[i + 1]}`;
+        wordPairs[pair] = (wordPairs[pair] || 0) + 1;
+      }
+    }
   });
 
   //  топ-20 наиболее часто используемых слов
   const frequentWords = Object.entries(words)
-
     .sort((a, b) => b[1] - a[1])
-
     .filter(([word, count]) => {
       if (Object.keys(words).length >= 20) {
         return count > 1;
@@ -131,6 +141,13 @@ function generateUserStats(chatData, userId) {
     })
     .slice(0, 20)
     .map(([word, count]) => ({ word, count }));
+
+  // Топ-15 наиболее часто встречающихся сочетаний слов
+  const frequentWordPairs = Object.entries(wordPairs)
+    .sort((a, b) => b[1] - a[1])
+    .filter(([pair, count]) => count > 1) // Фильтруем пары, встречающиеся более одного раза
+    .slice(0, 15)
+    .map(([pair, count]) => ({ pair, count }));
 
   //  сообщения по датам для анализа активности
   const messagesByDate = {};
@@ -175,6 +192,7 @@ function generateUserStats(chatData, userId) {
     totalMessages: userChat.messages.length, // Общее количество всех сообщений
     messagesByAuthor, // Распределение сообщений по авторам
     frequentWords, // Наиболее часто используемые слова
+    frequentWordPairs, // Наиболее часто встречающиеся сочетания слов
     dateStats, // Статистика по датам
     avgMessagesPerDay: Math.round(avgMessagesPerDay * 100) / 100, // Среднее число сообщений в день (округленное)
     chatPeriod: {

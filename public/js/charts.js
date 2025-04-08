@@ -133,3 +133,56 @@ function createDateChart(canvasId, data) {
     },
   });
 }
+
+// Создает график для частоты использования сочетаний слов
+function createWordPairsChart(canvasId, data) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext("2d");
+
+  const parent = canvas.parentNode;
+  const loaders = parent.querySelectorAll(".loading");
+  loaders.forEach((loader) => loader.remove());
+
+  if (!data || data.length === 0) {
+    parent.innerHTML =
+      '<div class="no-data">Недостаточно данных для анализа сочетаний слов</div>';
+    return;
+  }
+
+  // Ограничим до 10 самых частых сочетаний для лучшей читаемости
+  const top10Pairs = data.slice(0, 10);
+
+  const labels = top10Pairs.map((item) => item.pair);
+  const values = top10Pairs.map((item) => item.count);
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: "Частота использования",
+          data: values,
+          backgroundColor: "#69c9d0", // Используем дополнительный цвет TikTok для разнообразия
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+        x: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0,
+          },
+        },
+      },
+    },
+  });
+}

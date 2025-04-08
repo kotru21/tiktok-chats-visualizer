@@ -218,9 +218,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // добавляем класс full-width-card к первой карточке
     document.querySelector(".stat-card").classList.add("full-width-card");
 
+    // очистка предыдущих данных для новой диаграммы
+    document.getElementById("frequent-pairs").innerHTML =
+      '<canvas id="pairs-chart"></canvas><div class="loading">Загрузка...</div>';
+
     // визуализация статистики на графиках с помощью Chart.js
     createAuthorChart("author-chart", stats.messagesByAuthor);
     createWordsChart("words-chart", stats.frequentWords);
+    createWordPairsChart("pairs-chart", stats.frequentWordPairs);
     createDateChart("date-chart", stats.dateStats);
   }
 
