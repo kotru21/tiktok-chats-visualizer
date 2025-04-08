@@ -39,8 +39,8 @@ TikTok Data Visualizer - это веб-приложение для анализ�
 1. Клонируйте репозиторий:
 
 ```bash
-git clone https://github.com/your-username/tiktok-data-visualizer.git
-cd tiktok-data-visualizer/chat-analyzer
+git clone https://github.com/your-username/tiktok-chats-visualizer.git
+cd tiktok-chats-visualizer/chat-analyzer
 ```
 
 2. Установите зависимости:
