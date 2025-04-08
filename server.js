@@ -129,7 +129,7 @@ app.get("/api/users/:userId/stats", checkSessionData, (req, res) => {
   }
 });
 
-// Запуск сервера
+// Запуск сервера. Для production изменить на https и добавить домен
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}: http://localhost:${PORT}`);
 });
