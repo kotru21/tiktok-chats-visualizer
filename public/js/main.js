@@ -1,70 +1,25 @@
+import { setupUploader } from "./uploader.js";
+import { getUsers, getUserStats } from "./api.js";
+import { renderUserList, filterUserList } from "./ui/userList.js";
+import { renderStats } from "./ui/statsView.js";
+import "./theme.js"; // применяет тему при загрузке
+
 document.addEventListener("DOMContentLoaded", () => {
-  // настройка обработчиков загрузки файла
-  setupFileUpload();
+  setupUploader({ onUploaded: loadUsers });
   setupEventListeners();
 
-  // функция для настройки загрузки файла
-  function setupFileUpload() {
-    const uploadForm = document.getElementById("upload-form");
-    const chatFileInput = document.getElementById("chat-file");
-    const uploadStatus = document.getElementById("upload-status");
-    const fileText = document.querySelector(".file-text");
-
-    // отображение имени выбранного файла
-    chatFileInput.addEventListener("change", () => {
-      if (chatFileInput.files.length > 0) {
-        fileText.textContent = chatFileInput.files[0].name;
-      } else {
-        fileText.textContent = "Выберите JSON файл";
-      }
-    });
-
-    // обработка отправки формы
-    uploadForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      if (!chatFileInput.files[0]) {
-        uploadStatus.className = "upload-status status-error";
-        uploadStatus.textContent = "Пожалуйста, выберите файл";
-        return;
-      }
-
-      // отображение статуса загрузки
-      uploadStatus.className = "upload-status status-loading";
-      uploadStatus.innerHTML =
-        '<div class="spinner"></div><span>Загрузка файла...</span>';
-
-      // подготовка данных для отправки
-      const formData = new FormData();
-      formData.append("chatFile", chatFileInput.files[0]);
-
-      try {
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || "Ошибка при загрузке файла");
-        }
-
-        // отображение успешного сообщения
-        uploadStatus.className = "upload-status status-success";
-        uploadStatus.textContent = `Файл успешно загружен! Найдено ${result.count} чатов.`;
-
-        // скрытие формы загрузки
-        document.getElementById("upload-container").classList.add("hidden");
-
-        // загрузка списка пользователей
-        loadUsers();
-      } catch (error) {
-        console.error("Ошибка:", error);
-        uploadStatus.className = "upload-status status-error";
-        uploadStatus.textContent = error.message || "Ошибка при загрузке файла";
-      }
-    });
+  // загрузка списка пользователей
+  async function loadUsers() {
+    try {
+      const users = await getUsers();
+      renderUserList(document.getElementById("userList"), users, loadUserStats);
+      document.getElementById("sidebar").classList.add("active");
+    } catch (error) {
+      console.error("Ошибка:", error);
+      document.getElementById("userList").innerHTML = `<div class="error">${
+        error.message || "Ошибка при загрузке пользователей"
+      }</div>`;
+    }
   }
 
   // функция для загрузки списка пользователей
@@ -153,12 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
         '<canvas id="time-of-day-chart"></canvas><div class="loading">Загрузка...</div>';
 
       // загрузка статистики
-      const response = await fetch(`/api/users/${userId}/stats`);
-      if (!response.ok) {
-        throw new Error("Ошибка при загрузке статистики");
-      }
-
-      const stats = await response.json();
+      const stats = await getUserStats(userId);
       displayUserStats(stats);
     } catch (error) {
       console.error("Ошибка:", error);
@@ -169,74 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // функция для отображения статистики пользователя
   function displayUserStats(stats) {
-    // Определяем собственный идентификатор пользователя (обычно "Me" или имя аккаунта)
-    // TikTok обычно использует "Me" для обозначения собственных сообщений
-    const myMessageAuthor = Object.keys(stats.messagesByAuthor).find(
-      (author) => author !== stats.userId && author !== "TikTok"
-    );
-
-    // Количество сообщений от пользователя
-    const myMessages = stats.messagesByAuthor[myMessageAuthor] || 0;
-
-    // общая статистика в виде сетки 4х2
-    const generalStatsHtml = `
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-label">Всего сообщений</div>
-          <div class="stat-value">${stats.totalMessages}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Начало переписки</div>
-          <div class="stat-value">${stats.chatPeriod.firstDate}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Конец переписки</div>
-          <div class="stat-value">${stats.chatPeriod.lastDate}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Продолжительность</div>
-          <div class="stat-value">${stats.chatPeriod.totalDays} дн.</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Сообщений в день</div>
-          <div class="stat-value">${stats.avgMessagesPerDay}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Моих сообщений</div>
-          <div class="stat-value">${myMessages}</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Сообщений собеседника</div>
-          <div class="stat-value">${
-            stats.messagesByAuthor[stats.userId] || 0
-          }</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">Активных дней</div>
-          <div class="stat-value">${stats.dateStats.length}</div>
-        </div>
-      </div>
-    `;
-    document.getElementById("general-stats").innerHTML = generalStatsHtml;
-
-    // добавляем класс full-width-card к первой карточке
-    document.querySelector(".stat-card").classList.add("full-width-card");
-
-    // очистка предыдущих данных для новой диаграммы
-    document.getElementById("frequent-pairs").innerHTML =
-      '<canvas id="pairs-chart"></canvas><div class="loading">Загрузка...</div>';
-    document.getElementById("weekday-activity").innerHTML =
-      '<canvas id="weekday-chart"></canvas><div class="loading">Загрузка...</div>';
-    document.getElementById("time-of-day-activity").innerHTML =
-      '<canvas id="time-of-day-chart"></canvas><div class="loading">Загрузка...</div>';
-
-    // визуализация статистики на графиках с помощью Chart.js
-    createAuthorChart("author-chart", stats.messagesByAuthor);
-    createWordsChart("words-chart", stats.frequentWords);
-    createWordPairsChart("pairs-chart", stats.frequentWordPairs);
-    createDateChart("date-chart", stats.dateStats);
-    createWeekdayChart("weekday-chart", stats.messagesByWeekday);
-    createTimeOfDayChart("time-of-day-chart", stats.messagesByTimeOfDay);
+    renderStats(stats);
   }
 
   // настройка обработчиков событий
@@ -274,25 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // поиск по пользователям
     const searchInput = document.getElementById("user-search");
     if (searchInput) {
-      searchInput.addEventListener("input", filterUsers);
+      searchInput.addEventListener("input", () =>
+        filterUserList(document.getElementById("userList"), searchInput.value)
+      );
     }
-  }
-
-  // фильтрация пользователей при поиске
-  function filterUsers() {
-    const searchInput = document.getElementById("user-search");
-    const searchTerm = searchInput.value.toLowerCase();
-    const userItems = document.querySelectorAll(".user-item");
-
-    userItems.forEach((item) => {
-      const userName = item
-        .querySelector(".user-name")
-        .textContent.toLowerCase();
-      if (userName.includes(searchTerm)) {
-        item.style.display = "block";
-      } else {
-        item.style.display = "none";
-      }
-    });
   }
 });
