@@ -1,5 +1,7 @@
 # Tiktok Chats Visualizer
 
+[English version](./README.en.md)
+
 ![Приложение в тёмной теме](https://github.com/user-attachments/assets/f8ddb96b-2332-412a-893d-72cf20a82f3c)
 
 ## 📱 О проекте
