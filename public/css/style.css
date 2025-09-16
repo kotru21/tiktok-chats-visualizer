@@ -20,12 +20,7 @@
   --success-bg: #d4edda; /* Фон для успешных сообщений */
   --success-color: #155724; /* Цвет текста для успешных сообщений */
   --stat-item-bg: rgba(0, 0, 0, 0.02); /* Фон для элементов статистики */
-  --stat-item-hover: rgba(
-    238,
-    29,
-    82,
-    0.05
-  ); /* Фон при наведении для элементов статистики */
+  --stat-item-hover: rgba(238, 29, 82, 0.05); /* Фон при наведении для элементов статистики */
   --border-color: rgba(0, 0, 0, 0.1); /* Цвет границ */
   --skeleton-gradient: linear-gradient(
     90deg,
@@ -128,12 +123,21 @@
 }
 
 body {
-  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family:
+    "Montserrat",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    sans-serif;
   color: var(--text-color);
   background-color: var(--background-color);
   line-height: 1.6;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 h1,
@@ -385,7 +389,9 @@ h3 {
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow);
-  transition: var(--transition), background-color 0.3s ease;
+  transition:
+    var(--transition),
+    background-color 0.3s ease;
 }
 
 .stat-card:hover {
@@ -613,7 +619,9 @@ input[type="file"] {
   border-radius: 5px;
   color: var(--file-label-color);
   cursor: pointer;
-  transition: background-color 0.3s, border-color 0.3s;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
 }
 
 .file-label:hover {
@@ -621,34 +629,18 @@ input[type="file"] {
   border-color: #4a6fa5;
 }
 
+/* Подсветка при перетаскивании на область выбора файла */
+.file-label.dragover {
+  background-color: rgba(105, 201, 208, 0.15);
+  border-color: var(--secondary-color);
+}
+
 .file-icon {
   font-size: 24px;
   margin-right: 10px;
 }
 
-.upload-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 12px 20px;
-  background-color: #4a6fa5;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.upload-button:hover {
-  background-color: #3a5a8a;
-}
-
-.button-icon {
-  margin-right: 10px;
-  font-size: 18px;
-}
+/* Кнопка загрузки удалена из UI */
 
 .upload-status {
   margin-top: 15px;
@@ -676,6 +668,29 @@ input[type="file"] {
   display: none !important;
 }
 
+/* DnD Overlay */
+.dnd-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+.dnd-overlay.visible {
+  display: flex;
+}
+.dnd-overlay .dnd-overlay-content {
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 16px 24px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* Стили для сетки общей статистики */
 .stats-grid {
   display: grid;
@@ -693,7 +708,9 @@ input[type="file"] {
   padding: 10px;
   background-color: var(--stat-item-bg);
   border-radius: var(--border-radius);
-  transition: var(--transition), background-color 0.3s ease;
+  transition:
+    var(--transition),
+    background-color 0.3s ease;
 }
 
 .stat-item:hover {

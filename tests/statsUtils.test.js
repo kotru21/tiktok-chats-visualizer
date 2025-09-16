@@ -1,5 +1,5 @@
-const assert = require("assert");
-const { countByAuthor, tally, topNEntries } = require("../utils/statsUtils");
+import assert from "assert";
+import { countByAuthor, tally, topNEntries } from "../utils/statsUtils.js";
 
 describe("statsUtils", () => {
   it("countByAuthor should count by from field", () => {

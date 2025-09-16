@@ -12,7 +12,7 @@ export function createDateChart(canvasId, data) {
   const values = data.map((item) => item.count);
   const colorScheme = getChartColorScheme();
 
-  new Chart(ctx, {
+  return new Chart(ctx, {
     type: "line",
     data: {
       labels: labels,

@@ -7,14 +7,31 @@ export function setupUploader({ onUploaded } = {}) {
   const fileText = document.querySelector(".file-text");
   const fileLabel = document.querySelector(".file-label");
 
+  // DnD overlay
+  let dragCounter = 0;
+  const ensureOverlay = () => {
+    let overlay = document.getElementById("dnd-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "dnd-overlay";
+      overlay.className = "dnd-overlay";
+      overlay.innerHTML = "<div class=\"dnd-overlay-content\">Отпустите JSON-файл для анализа</div>";
+      document.body.appendChild(overlay);
+    }
+    return overlay;
+  };
+
   if (!uploadForm || !chatFileInput) return;
 
   const setStatus = (type, message) => {
     uploadStatus.className = `upload-status status-${type}`;
+    if (type === "loading") {
+      uploadStatus.setAttribute("aria-busy", "true");
+    } else {
+      uploadStatus.setAttribute("aria-busy", "false");
+    }
     uploadStatus.innerHTML =
-      type === "loading"
-        ? `<div class="spinner"></div><span>${message}</span>`
-        : message;
+      type === "loading" ? `<div class="spinner"></div><span>${message}</span>` : message;
   };
 
   const handleFile = async (file) => {
@@ -30,10 +47,7 @@ export function setupUploader({ onUploaded } = {}) {
     setStatus("loading", "Загрузка файла...");
     try {
       const result = await uploadFile(file);
-      setStatus(
-        "success",
-        `Файл успешно загружен! Найдено ${result.count} чатов.`
-      );
+      setStatus("success", `Файл успешно загружен! Найдено ${result.count} чатов.`);
       document.getElementById("upload-container")?.classList.add("hidden");
       onUploaded && onUploaded();
     } catch (err) {
@@ -64,23 +78,23 @@ export function setupUploader({ onUploaded } = {}) {
   const unhighlight = () => fileLabel?.classList.remove("dragover");
 
   ["dragenter", "dragover"].forEach((evt) => {
-    uploadForm.addEventListener(evt, (e) => {
-      preventDefaults(e);
+    uploadForm.addEventListener(evt, (_e) => {
+      preventDefaults(_e);
       highlight();
     });
-    fileLabel?.addEventListener(evt, (e) => {
-      preventDefaults(e);
+    fileLabel?.addEventListener(evt, (_e) => {
+      preventDefaults(_e);
       highlight();
     });
   });
 
   ["dragleave", "drop"].forEach((evt) => {
-    uploadForm.addEventListener(evt, (e) => {
-      preventDefaults(e);
+    uploadForm.addEventListener(evt, (_e) => {
+      preventDefaults(_e);
       unhighlight();
     });
-    fileLabel?.addEventListener(evt, (e) => {
-      preventDefaults(e);
+    fileLabel?.addEventListener(evt, (_e) => {
+      preventDefaults(_e);
       unhighlight();
     });
   });
@@ -98,11 +112,87 @@ export function setupUploader({ onUploaded } = {}) {
     const file = files[0];
     try {
       chatFileInput.files = files;
-    } catch (_) {
+    } catch {
       const dtAssign = new DataTransfer();
       dtAssign.items.add(file);
       chatFileInput.files = dtAssign.files;
     }
     handleFile(file);
+  });
+
+  // Глобальные события для оверлея и дропа «куда угодно»
+  window.addEventListener("dragenter", (_e) => {
+    // Не мешаем, если тянем изнутри формы
+    dragCounter++;
+    const overlay = ensureOverlay();
+    overlay.classList.add("visible");
+  });
+  window.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    const overlay = ensureOverlay();
+    overlay.classList.add("visible");
+  });
+  window.addEventListener("dragleave", (_e) => {
+    dragCounter = Math.max(0, dragCounter - 1);
+    if (dragCounter === 0) {
+      const overlay = ensureOverlay();
+      overlay.classList.remove("visible");
+    }
+  });
+  window.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dragCounter = 0;
+    const overlay = ensureOverlay();
+    overlay.classList.remove("visible");
+    // Если дропнули внутрь формы, локальный обработчик справится
+    if (uploadForm.contains(e.target)) return;
+    const files = e.dataTransfer?.files || [];
+    if (!files.length) return;
+    const file = files[0];
+    try {
+      chatFileInput.files = files;
+    } catch {
+      const dtAssign = new DataTransfer();
+      dtAssign.items.add(file);
+      chatFileInput.files = dtAssign.files;
+    }
+    handleFile(file);
+  });
+
+  // Вставка из буфера обмена: поддержка JSON-текста или файла
+  window.addEventListener("paste", async (e) => {
+    // Не перехватываем, если фокус на инпуте/текстареа/контент-эдитабл
+    const ae = document.activeElement;
+    const isEditable =
+      ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA" || ae.isContentEditable);
+    if (isEditable) return;
+
+    const items = Array.from(e.clipboardData?.items || []);
+    // Пробуем как файл
+    const fileItem = items.find((it) => it.kind === "file");
+    if (fileItem) {
+      const file = fileItem.getAsFile();
+      if (file && file.name.toLowerCase().endsWith(".json")) {
+        handleFile(file);
+        return;
+      }
+    }
+    // Пробуем как текст JSON
+    const text = e.clipboardData?.getData("text");
+    if (text) {
+      try {
+        JSON.parse(text);
+        const blob = new Blob([text], { type: "application/json" });
+        const file = new File([blob], "pasted.json", { type: "application/json" });
+        try {
+          const dtAssign = new DataTransfer();
+          dtAssign.items.add(file);
+          chatFileInput.files = dtAssign.files;
+        } catch {}
+        handleFile(file);
+      } catch {
+        // не JSON — игнорируем
+      }
+    }
   });
 }

@@ -6,6 +6,87 @@ import {
   createWeekdayChart,
   createTimeOfDayChart,
 } from "../charts.js";
+import { invalidateChartColorCache } from "../charts/colorScheme.js";
+
+// Реестр активных графиков для корректного уничтожения/пересоздания
+let chartRegistry = [];
+
+function destroyCharts() {
+  chartRegistry.forEach((chart) => {
+    try {
+      chart.destroy();
+    } catch {}
+  });
+  chartRegistry = [];
+}
+
+function createAllCharts(stats) {
+  const jobs = [
+    {
+      id: "author-chart",
+      create: () => createAuthorChart("author-chart", stats.messagesByAuthor),
+    },
+    {
+      id: "words-chart",
+      create: () => createWordsChart("words-chart", stats.frequentWords),
+    },
+    {
+      id: "pairs-chart",
+      create: () => createWordPairsChart("pairs-chart", stats.frequentWordPairs),
+    },
+    {
+      id: "date-chart",
+      create: () => createDateChart("date-chart", stats.dateStats),
+    },
+    {
+      id: "weekday-chart",
+      create: () => createWeekdayChart("weekday-chart", stats.messagesByWeekday),
+    },
+    {
+      id: "time-of-day-chart",
+      create: () => createTimeOfDayChart("time-of-day-chart", stats.messagesByTimeOfDay),
+    },
+  ];
+
+  // Ленивая инициализация с IntersectionObserver
+  const observer = new IntersectionObserver(
+    (entries, obs) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const canvas = entry.target.querySelector("canvas");
+          if (!canvas) continue;
+          const job = jobs.find((j) => j.id === canvas.id);
+          if (!job) continue;
+          const chart = job.create();
+          if (chart) chartRegistry.push(chart);
+          obs.unobserve(entry.target);
+        }
+      }
+    },
+    { root: null, rootMargin: "0px", threshold: 0.2 }
+  );
+
+  // Подписываемся на карточки-контейнеры с графиками
+  [
+    document.getElementById("messages-by-author"),
+    document.getElementById("frequent-words"),
+    document.getElementById("frequent-pairs"),
+    document.getElementById("date-activity"),
+    document.getElementById("weekday-activity"),
+    document.getElementById("time-of-day-activity"),
+  ].forEach((container) => container && observer.observe(container));
+}
+
+// Храним последние статистики, чтобы пересоздавать на смену темы
+let lastStats = null;
+
+// Подписка на смену темы: пересоздаем графики, чтобы обновить цвета осей/лейблов
+window.addEventListener("theme:changed", () => {
+  if (!lastStats) return;
+  invalidateChartColorCache();
+  destroyCharts();
+  createAllCharts(lastStats);
+});
 
 export function renderStats(stats) {
   // Общая карточка
@@ -44,17 +125,18 @@ export function renderStats(stats) {
 
   // Обновляем контейнеры
   document.getElementById("frequent-pairs").innerHTML =
-    '<canvas id="pairs-chart"></canvas><div class="loading">Загрузка...</div>';
+    "<canvas id=\"pairs-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
   document.getElementById("weekday-activity").innerHTML =
-    '<canvas id="weekday-chart"></canvas><div class="loading">Загрузка...</div>';
+    "<canvas id=\"weekday-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
   document.getElementById("time-of-day-activity").innerHTML =
-    '<canvas id="time-of-day-chart"></canvas><div class="loading">Загрузка...</div>';
+    "<canvas id=\"time-of-day-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
 
-  // Чарты
-  createAuthorChart("author-chart", stats.messagesByAuthor);
-  createWordsChart("words-chart", stats.frequentWords);
-  createWordPairsChart("pairs-chart", stats.frequentWordPairs);
-  createDateChart("date-chart", stats.dateStats);
-  createWeekdayChart("weekday-chart", stats.messagesByWeekday);
-  createTimeOfDayChart("time-of-day-chart", stats.messagesByTimeOfDay);
+  // Уничтожаем предыдущие графики, если есть
+  destroyCharts();
+
+  // Создаем новые графики (лениво по видимости)
+  createAllCharts(stats);
+
+  // Сохраняем последние данные статистики
+  lastStats = stats;
 }

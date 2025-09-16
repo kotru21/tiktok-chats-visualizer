@@ -1,16 +1,15 @@
-const assert = require("assert");
-const {
+import assert from "assert";
+import {
   removeUrls,
   normalizeText,
   splitWords,
   filterWords,
   getBigrams,
-} = require("../utils/textUtils");
+} from "../utils/textUtils.js";
 
 describe("textUtils", () => {
   it("removeUrls should strip http/https and www domains", () => {
-    const input =
-      "see https://example.com and http://x.y and www.test.ru hello";
+    const input = "see https://example.com and http://x.y and www.test.ru hello";
     const out = removeUrls(input);
     assert(!out.includes("http"));
     assert(!out.includes("www."));

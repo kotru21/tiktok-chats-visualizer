@@ -7,7 +7,7 @@
  * @param {string} text
  * @returns {string}
  */
-function removeUrls(text) {
+export function removeUrls(text) {
   return text
     .replace(/https?:\/\/[^\s]+/g, "")
     .replace(/www\.[^\s]+/g, "")
@@ -19,7 +19,7 @@ function removeUrls(text) {
  * @param {string} text
  * @returns {string}
  */
-function normalizeText(text) {
+export function normalizeText(text) {
   return text
     .toLowerCase()
     .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()\"\"\"''«»\[\]]/g, " ")
@@ -32,7 +32,7 @@ function normalizeText(text) {
  * @param {string} text
  * @returns {string[]}
  */
-function splitWords(text) {
+export function splitWords(text) {
   if (!text) return [];
   return text.split(" ");
 }
@@ -44,7 +44,7 @@ function splitWords(text) {
  * @param {number} minLen
  * @returns {string[]}
  */
-function filterWords(words, stopWordsSet, minLen = 4) {
+export function filterWords(words, stopWordsSet, minLen = 4) {
   return words.filter(
     (word) =>
       word &&
@@ -60,18 +60,10 @@ function filterWords(words, stopWordsSet, minLen = 4) {
  * @param {string[]} words
  * @returns {string[]}
  */
-function getBigrams(words) {
+export function getBigrams(words) {
   const pairs = [];
   for (let i = 0; i < words.length - 1; i++) {
     pairs.push(`${words[i]} ${words[i + 1]}`);
   }
   return pairs;
 }
-
-module.exports = {
-  removeUrls,
-  normalizeText,
-  splitWords,
-  filterWords,
-  getBigrams,
-};

@@ -2,7 +2,7 @@
  * Наборы стоп-слов для русского языка.
  */
 
-const baseStopWords = [
+export const baseStopWords = [
   "это",
   "как",
   "так",
@@ -16,7 +16,7 @@ const baseStopWords = [
   "оно",
 ];
 
-const additionalStopWords = [
+export const additionalStopWords = [
   "есть",
   "быть",
   "просто",
@@ -36,10 +36,4 @@ const additionalStopWords = [
   "если",
 ];
 
-const allStopWords = [...baseStopWords, ...additionalStopWords];
-
-module.exports = {
-  baseStopWords,
-  additionalStopWords,
-  allStopWords,
-};
+export const allStopWords = [...baseStopWords, ...additionalStopWords];

@@ -1,10 +1,10 @@
-const assert = require("assert");
-const {
+import assert from "assert";
+import {
   getWeekdayName,
   getTimeOfDayBucket,
   formatDateISO,
   formatDisplayDate,
-} = require("../utils/dateUtils");
+} from "../utils/dateUtils.js";
 
 describe("dateUtils", () => {
   it("getWeekdayName should map day index", () => {

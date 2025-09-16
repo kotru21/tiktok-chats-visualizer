@@ -1,4 +1,5 @@
 import { getChartColorScheme } from "./colorScheme.js";
+import { WEEKDAY_ORDER } from "../config.js";
 
 export function createWeekdayChart(canvasId, data) {
   const canvas = document.getElementById(canvasId);
@@ -8,21 +9,11 @@ export function createWeekdayChart(canvasId, data) {
   const loaders = parent.querySelectorAll(".loading");
   loaders.forEach((loader) => loader.remove());
 
-  const weekdayOrder = [
-    "Понедельник",
-    "Вторник",
-    "Среда",
-    "Четверг",
-    "Пятница",
-    "Суббота",
-    "Воскресенье",
-  ];
-
-  const labels = weekdayOrder;
-  const values = weekdayOrder.map((day) => data[day] || 0);
+  const labels = WEEKDAY_ORDER;
+  const values = WEEKDAY_ORDER.map((day) => data[day] || 0);
   const colorScheme = getChartColorScheme();
 
-  new Chart(ctx, {
+  return new Chart(ctx, {
     type: "bar",
     data: {
       labels: labels,

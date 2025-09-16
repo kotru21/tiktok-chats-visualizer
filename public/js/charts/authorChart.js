@@ -12,20 +12,14 @@ export function createAuthorChart(canvasId, data) {
   const values = Object.values(data);
   const colorScheme = getChartColorScheme();
 
-  new Chart(ctx, {
+  return new Chart(ctx, {
     type: "pie",
     data: {
       labels: labels,
       datasets: [
         {
           data: values,
-          backgroundColor: [
-            "#4a6fa5",
-            "#ff7675",
-            "#fdcb6e",
-            "#00cec9",
-            "#6c5ce7",
-          ],
+          backgroundColor: ["#4a6fa5", "#ff7675", "#fdcb6e", "#00cec9", "#6c5ce7"],
           borderWidth: 1,
         },
       ],

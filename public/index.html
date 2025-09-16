@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-      rel="stylesheet" />
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="css/style.css" />
     <meta name="color-scheme" content="light dark" />
   </head>
@@ -17,13 +18,13 @@
       <!-- Мобильная навигация -->
       <div class="mobile-header">
         <h1>Анализатор чатов</h1>
-        <button id="sidebar-toggle" aria-label="Открыть список пользователей">
+        <button id="sidebar-toggle" class="hidden" aria-label="Открыть список пользователей">
           <span class="hamburger"></span>
         </button>
       </div>
 
       <!-- Боковая панель с пользователями -->
-      <aside class="sidebar" id="sidebar">
+      <aside class="sidebar hidden" id="sidebar">
         <div class="sidebar-header">
           <h2>Пользователи</h2>
           <div class="search-container">
@@ -31,7 +32,8 @@
               type="text"
               id="user-search"
               placeholder="Поиск..."
-              aria-label="Поиск пользователей" />
+              aria-label="Поиск пользователей"
+            />
           </div>
         </div>
         <div class="user-list" id="userList">
@@ -51,45 +53,43 @@
             <div id="upload-container" class="upload-container">
               <h2>Загрузите ваш файл данных TikTok</h2>
               <p class="upload-info">
-                Для анализа необходим файл JSON, полученный из запроса на
-                выгрузку данных в TikTok. Все данные обрабатываются только в
-                вашем браузере и не сохраняются на сервере.
+                Для анализа необходим файл JSON, полученный из запроса на выгрузку данных в TikTok.
+                Данные загружаются на сервер и не сохраняются (анонимная сессия).
               </p>
               <form id="upload-form" enctype="multipart/form-data">
                 <div class="file-input-container">
-                  <input
-                    type="file"
-                    id="chat-file"
-                    name="chatFile"
-                    accept=".json"
-                    required />
+                  <input type="file" id="chat-file" name="chatFile" accept=".json" required />
                   <label for="chat-file" class="file-label">
                     <span class="file-icon">📁</span>
                     <span class="file-text">Выберите JSON файл</span>
                   </label>
                 </div>
-                <button type="submit" class="upload-button">
-                  <span class="button-icon">📊</span>
-                  Загрузить и анализировать
-                </button>
               </form>
-              <div id="upload-status" class="upload-status"></div>
+              <div
+                id="upload-status"
+                class="upload-status"
+                role="status"
+                aria-live="polite"
+                aria-busy="false"
+              ></div>
             </div>
             <svg
               class="welcome-icon"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               width="80"
-              height="80">
+              height="80"
+            >
               <path fill="none" d="M0 0h24v24H0z" />
               <path
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"
-                fill="currentColor" />
+                fill="currentColor"
+              />
             </svg>
             <h2>Добро пожаловать в Анализатор чатов!</h2>
             <p>
-              Выберите пользователя из списка слева, чтобы увидеть подробную
-              статистику вашего общения.
+              Выберите пользователя из списка слева, чтобы увидеть подробную статистику вашего
+              общения.
             </p>
             <p class="welcome-tip">Вы сможете узнать:</p>
             <ul class="welcome-features">
@@ -107,7 +107,8 @@
             <button
               id="back-to-list"
               class="mobile-only back-button"
-              aria-label="Вернуться к списку">
+              aria-label="Вернуться к списку"
+            >
               ← К списку пользователей
             </button>
           </div>
@@ -189,9 +190,7 @@
                 <h3>Активность по времени суток</h3>
                 <span class="card-icon">🕒</span>
               </div>
-              <div
-                id="time-of-day-activity"
-                class="card-content chart-container">
+              <div id="time-of-day-activity" class="card-content chart-container">
                 <canvas id="time-of-day-chart"></canvas>
                 <div class="loading">Загрузка...</div>
               </div>

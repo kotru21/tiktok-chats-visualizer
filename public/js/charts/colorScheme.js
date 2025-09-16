@@ -1,11 +1,23 @@
-export function getChartColorScheme() {
-  const isDarkMode =
-    window.matchMedia("(prefers-color-scheme: dark)").matches ||
-    document.body.classList.contains("dark-theme");
+import { computeChartDisplayMode, buildChartColorScheme } from "../utils/themeUtils.js";
 
-  return {
-    fontColor: isDarkMode ? "#e1e1e1" : "#333",
-    gridColor: isDarkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
-    backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
-  };
+let cachedScheme = null;
+let cachedMode = null;
+
+function computeMode() {
+  const hasDarkClass = document.body.classList.contains("dark-theme");
+  const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return computeChartDisplayMode({ hasDarkClass, systemPrefersDark });
+}
+
+export function getChartColorScheme() {
+  const mode = computeMode();
+  if (cachedScheme && cachedMode === mode) return cachedScheme;
+  cachedMode = mode;
+  cachedScheme = buildChartColorScheme(mode);
+  return cachedScheme;
+}
+
+export function invalidateChartColorCache() {
+  cachedScheme = null;
+  cachedMode = null;
 }

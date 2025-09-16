@@ -13,76 +13,17 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const users = await getUsers();
       renderUserList(document.getElementById("userList"), users, loadUserStats);
-      document.getElementById("sidebar").classList.add("active");
+      const sidebar = document.getElementById("sidebar");
+      const toggleBtn = document.getElementById("sidebar-toggle");
+      sidebar.classList.remove("hidden");
+      sidebar.classList.add("active");
+      toggleBtn?.classList.remove("hidden");
     } catch (error) {
       console.error("Ошибка:", error);
       document.getElementById("userList").innerHTML = `<div class="error">${
         error.message || "Ошибка при загрузке пользователей"
       }</div>`;
     }
-  }
-
-  // функция для загрузки списка пользователей
-  async function loadUsers() {
-    try {
-      const response = await fetch("/api/users");
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Ошибка при загрузке пользователей");
-      }
-
-      const users = await response.json();
-      displayUsers(users);
-
-      // отображение сайдбара после успешной загрузки
-      document.getElementById("sidebar").classList.add("active");
-    } catch (error) {
-      console.error("Ошибка:", error);
-      document.getElementById("userList").innerHTML = `<div class="error">${
-        error.message || "Ошибка при загрузке пользователей"
-      }</div>`;
-    }
-  }
-
-  // функция для отображения списка пользователей
-  function displayUsers(users) {
-    const userListElement = document.getElementById("userList");
-
-    if (users.length === 0) {
-      userListElement.innerHTML =
-        '<div class="no-data">Пользователи не найдены</div>';
-      return;
-    }
-
-    const userItems = users
-      .map(
-        (user) => `
-            <div class="user-item" data-user-id="${user.id}">
-                <div class="user-name">${user.name}</div>
-                <div class="user-message-count">${user.messageCount} сообщений</div>
-            </div>
-        `
-      )
-      .join("");
-
-    userListElement.innerHTML = userItems;
-
-    // добавление обработчиков событий для пользователей
-    document.querySelectorAll(".user-item").forEach((item) => {
-      item.addEventListener("click", function () {
-        // удаление активного класса у всех элементов
-        document
-          .querySelectorAll(".user-item")
-          .forEach((el) => el.classList.remove("active"));
-
-        // добавление активного класса к выбранному элементу
-        this.classList.add("active");
-
-        // загрузка статистики для выбранного пользователя
-        const userId = this.getAttribute("data-user-id");
-        loadUserStats(userId);
-      });
-    });
   }
 
   // функция для загрузки статистики пользователя
@@ -95,17 +36,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // очистка предыдущих данных
       document.getElementById("general-stats").innerHTML =
-        '<div class="loading">Загрузка статистики...</div>';
+        "<div class=\"loading\">Загрузка статистики...</div>";
       document.getElementById("messages-by-author").innerHTML =
-        '<canvas id="author-chart"></canvas><div class="loading">Загрузка...</div>';
+        "<canvas id=\"author-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
       document.getElementById("frequent-words").innerHTML =
-        '<canvas id="words-chart"></canvas><div class="loading">Загрузка...</div>';
+        "<canvas id=\"words-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
       document.getElementById("date-activity").innerHTML =
-        '<canvas id="date-chart"></canvas><div class="loading">Загрузка...</div>';
+        "<canvas id=\"date-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
       document.getElementById("weekday-activity").innerHTML =
-        '<canvas id="weekday-chart"></canvas><div class="loading">Загрузка...</div>';
+        "<canvas id=\"weekday-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
       document.getElementById("time-of-day-activity").innerHTML =
-        '<canvas id="time-of-day-chart"></canvas><div class="loading">Загрузка...</div>';
+        "<canvas id=\"time-of-day-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
 
       // загрузка статистики
       const stats = await getUserStats(userId);
@@ -113,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error("Ошибка:", error);
       document.getElementById("general-stats").innerHTML =
-        '<div class="error">Ошибка при загрузке статистики. Пожалуйста, попробуйте позже.</div>';
+        "<div class=\"error\">Ошибка при загрузке статистики. Пожалуйста, попробуйте позже.</div>";
     }
   }
 

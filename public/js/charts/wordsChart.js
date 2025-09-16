@@ -1,4 +1,5 @@
 import { getChartColorScheme } from "./colorScheme.js";
+import { CHART_TOP_N_WORDS } from "../config.js";
 
 export function createWordsChart(canvasId, data) {
   const canvas = document.getElementById(canvasId);
@@ -9,17 +10,17 @@ export function createWordsChart(canvasId, data) {
   loaders.forEach((loader) => loader.remove());
 
   if (!data || data.length === 0) {
-    parent.innerHTML = '<div class="no-data">Недостаточно данных</div>';
+    parent.innerHTML = "<div class=\"no-data\">Недостаточно данных</div>";
     return;
   }
 
-  const top10Words = data.slice(0, 10);
+  const top10Words = data.slice(0, CHART_TOP_N_WORDS);
 
   const labels = top10Words.map((item) => item.word);
   const values = top10Words.map((item) => item.count);
   const colorScheme = getChartColorScheme();
 
-  new Chart(ctx, {
+  return new Chart(ctx, {
     type: "bar",
     data: {
       labels: labels,

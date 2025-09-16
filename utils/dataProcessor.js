@@ -4,22 +4,15 @@
  *  - extractUsers(chatData)
  *  - generateUserStats(chatData, userId)
  */
-const { allStopWords } = require("./stopWords");
-const {
-  removeUrls,
-  normalizeText,
-  splitWords,
-  filterWords,
-  getBigrams,
-} = require("./textUtils");
-const {
-  weekdayNames,
+import { allStopWords } from "./stopWords.js";
+import { removeUrls, normalizeText, splitWords, filterWords, getBigrams } from "./textUtils.js";
+import {
   getWeekdayName,
   getTimeOfDayBucket,
   formatDateISO,
   formatDisplayDate,
-} = require("./dateUtils");
-const { countByAuthor, tally, topNEntries } = require("./statsUtils");
+} from "./dateUtils.js";
+import { countByAuthor } from "./statsUtils.js";
 
 /**
  * Извлекает список уникальных пользователей из массива данных чатов.
@@ -28,7 +21,7 @@ const { countByAuthor, tally, topNEntries } = require("./statsUtils");
  * @param {Array} chatData - Массив данных чатов
  * @returns {Array} Массив объектов пользователей с id, именем и количеством сообщений
  */
-function extractUsers(chatData) {
+export function extractUsers(chatData) {
   return chatData.map((chat) => ({
     id: chat.user,
     name: chat.user,
@@ -49,7 +42,7 @@ function extractUsers(chatData) {
  * @param {string} userId - ID пользователя для анализа
  * @returns {Object|null} Объект с детальной статистикой или null, если пользователь не найден
  */
-function generateUserStats(chatData, userId) {
+export function generateUserStats(chatData, userId) {
   const userChat = chatData.find((chat) => chat.user === userId);
   if (!userChat) return null;
 
@@ -131,8 +124,7 @@ function generateUserStats(chatData, userId) {
   const firstDateFormatted = firstDate ? formatDisplayDate(firstDate) : "Н/Д";
   const lastDateFormatted = lastDate ? formatDisplayDate(lastDate) : "Н/Д";
 
-  const avgMessagesPerDay =
-    totalDays > 0 ? userChat.messages.length / totalDays : 0;
+  const avgMessagesPerDay = totalDays > 0 ? userChat.messages.length / totalDays : 0;
 
   return {
     userId,
@@ -152,7 +144,4 @@ function generateUserStats(chatData, userId) {
   };
 }
 
-module.exports = {
-  extractUsers,
-  generateUserStats,
-};
+// ESM: именованные экспорты выше

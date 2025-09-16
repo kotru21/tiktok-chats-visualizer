@@ -2,15 +2,18 @@
  * Основной файл сервера для приложения анализа данных чатов TikTok.
  * Использует Express для создания RESTful API и обслуживания статических файлов.
  */
-const express = require("express");
-const path = require("path");
-const session = require("express-session");
-const multer = require("multer");
-const { v4: uuidv4 } = require("uuid");
-const dataProcessor = require("./utils/dataProcessor");
+import express from "express";
+import path from "node:path";
+import session from "express-session";
+import multer from "multer";
+import { v4 as uuidv4 } from "uuid";
+import * as dataProcessor from "./utils/dataProcessor.js";
+import { fileURLToPath } from "node:url";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Настройка хранилища для загружаемых файлов (в памяти)
 const storage = multer.memoryStorage();
@@ -35,9 +38,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Проверка наличия загруженных данных в сессии
 const checkSessionData = (req, res, next) => {
   if (!req.session.chatData) {
-    return res
-      .status(400)
-      .json({ error: "Данные не загружены. Загрузите файл чатов." });
+    return res.status(400).json({ error: "Данные не загружены. Загрузите файл чатов." });
   }
   next();
 };
@@ -54,13 +55,10 @@ app.post("/api/upload", upload.single("chatFile"), (req, res) => {
     const parsedData = JSON.parse(fileContent);
 
     // Навигация по вложенной структуре JSON файла TikTok
-    const chatHistory =
-      parsedData?.["Direct Message"]?.["Direct Messages"]?.["ChatHistory"];
+    const chatHistory = parsedData?.["Direct Message"]?.["Direct Messages"]?.["ChatHistory"];
 
     if (!chatHistory) {
-      return res
-        .status(400)
-        .json({ error: "Формат файла не соответствует экспорту TikTok" });
+      return res.status(400).json({ error: "Формат файла не соответствует экспорту TikTok" });
     }
 
     // Преобразование данных в удобный формат
@@ -106,9 +104,7 @@ app.get("/api/users", checkSessionData, (req, res) => {
     res.json(users);
   } catch (error) {
     console.error("Ошибка при обработке данных:", error);
-    res
-      .status(500)
-      .json({ error: "Ошибка при получении списка пользователей" });
+    res.status(500).json({ error: "Ошибка при получении списка пользователей" });
   }
 });
 
@@ -116,16 +112,11 @@ app.get("/api/users", checkSessionData, (req, res) => {
 app.get("/api/users/:userId/stats", checkSessionData, (req, res) => {
   try {
     const userId = req.params.userId;
-    const userStats = dataProcessor.generateUserStats(
-      req.session.chatData,
-      userId
-    );
+    const userStats = dataProcessor.generateUserStats(req.session.chatData, userId);
     res.json(userStats);
   } catch (error) {
     console.error("Ошибка при обработке статистики:", error);
-    res
-      .status(500)
-      .json({ error: "Ошибка при получении статистики пользователя" });
+    res.status(500).json({ error: "Ошибка при получении статистики пользователя" });
   }
 });
 
