@@ -1,92 +1,68 @@
-import assert from "assert";
-import { JSDOM } from "jsdom";
+import { describe, it, expect, beforeEach } from "bun:test";
+
+// happy-dom регистрируется в tests/setup.ts через bunfig.toml preload
 
 interface SetupDomOptions {
   prefersDark?: boolean;
   storedTheme?: string | null;
 }
 
-interface MockLocalStorage {
-  getItem: (k: string) => string | null;
-  setItem: (k: string, v: string) => void;
-  removeItem: (k: string) => void;
-}
+// Хелпер для настройки окна и документа
+function setupDom({ prefersDark = false, storedTheme = null }: SetupDomOptions = {}): void {
+  // Сбрасываем состояние
+  document.body.className = "";
+  localStorage.clear();
 
-function setupDom({ prefersDark = false, storedTheme = null }: SetupDomOptions = {}): JSDOM {
-  const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-    url: "http://localhost/",
-    pretendToBeVisual: true,
-  });
-
-  // localStorage заглушка
-  const store = new Map<string, string>();
-  if (storedTheme) store.set("theme", storedTheme);
-
-  const mockLocalStorage: MockLocalStorage = {
-    getItem: (k: string) => (store.has(k) ? store.get(k)! : null),
-    setItem: (k: string, v: string) => {
-      store.set(k, v);
-    },
-    removeItem: (k: string) => {
-      store.delete(k);
-    },
-  };
-
-  Object.defineProperty(dom.window, "localStorage", { value: mockLocalStorage, writable: true });
+  if (storedTheme) localStorage.setItem("theme", storedTheme);
 
   // matchMedia заглушка
-  dom.window.matchMedia = ((query: string) => ({
+  window.matchMedia = ((query: string) => ({
     matches: query.includes("dark") ? prefersDark : false,
     media: query,
     addEventListener: () => {},
     removeEventListener: () => {},
-  })) as unknown as typeof dom.window.matchMedia;
-
-  return dom;
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => true,
+    onchange: null,
+  })) as typeof window.matchMedia;
 }
 
 describe("theme", () => {
+  beforeEach(() => {
+    // Очищаем кеш модуля перед каждым тестом
+    delete require.cache[require.resolve("../public/js/theme.js")];
+  });
+
   it("detectColorScheme: должен уважать сохранённую тему", async () => {
-    const dom = setupDom({ prefersDark: false, storedTheme: "dark" });
-    (global as unknown as { window: typeof dom.window }).window = dom.window;
-    (global as unknown as { document: typeof dom.window.document }).document = dom.window.document;
-    (global as unknown as { localStorage: MockLocalStorage }).localStorage = dom.window
-      .localStorage as unknown as MockLocalStorage;
+    setupDom({ prefersDark: false, storedTheme: "dark" });
 
     const mod = await import("../public/js/theme.js");
     const scheme = mod.detectColorScheme();
-    assert.strictEqual(scheme, "dark");
+    expect(scheme).toBe("dark");
   });
 
   it("applyTheme: добавляет/удаляет класс и пишет в localStorage", async () => {
-    const dom = setupDom();
-    (global as unknown as { window: typeof dom.window }).window = dom.window;
-    (global as unknown as { document: typeof dom.window.document }).document = dom.window.document;
-    (global as unknown as { localStorage: MockLocalStorage }).localStorage = dom.window
-      .localStorage as unknown as MockLocalStorage;
+    setupDom();
 
     const { applyTheme } = await import("../public/js/theme.js");
 
     applyTheme("dark");
-    assert.ok(document.body.classList.contains("dark-theme"));
-    assert.strictEqual(localStorage.getItem("theme"), "dark");
+    expect(document.body.classList.contains("dark-theme")).toBe(true);
+    expect(localStorage.getItem("theme")).toBe("dark");
 
     applyTheme("light");
-    assert.ok(!document.body.classList.contains("dark-theme"));
-    assert.strictEqual(localStorage.getItem("theme"), "light");
+    expect(document.body.classList.contains("dark-theme")).toBe(false);
+    expect(localStorage.getItem("theme")).toBe("light");
   });
 
   it("toggleTheme: переключает сохранённую тему", async () => {
-    const dom = setupDom({ storedTheme: "dark" });
-    (global as unknown as { window: typeof dom.window }).window = dom.window;
-    (global as unknown as { document: typeof dom.window.document }).document = dom.window.document;
-    (global as unknown as { localStorage: MockLocalStorage }).localStorage = dom.window
-      .localStorage as unknown as MockLocalStorage;
+    setupDom({ storedTheme: "dark" });
 
     const { toggleTheme } = await import("../public/js/theme.js");
     toggleTheme();
-    assert.strictEqual(localStorage.getItem("theme"), "light");
+    expect(localStorage.getItem("theme")).toBe("light");
     toggleTheme();
-    assert.strictEqual(localStorage.getItem("theme"), "dark");
+    expect(localStorage.getItem("theme")).toBe("dark");
   });
 });

@@ -28,8 +28,8 @@
     "checkJs": false,
     "noEmit": true,
 
-    // Типы
-    "types": ["mocha"],
+    // Типы Bun
+    "types": ["bun-types"],
 
     // Алиасы путей (baseUrl устарел в следующей версии TypeScript — используем только paths)
     "paths": {

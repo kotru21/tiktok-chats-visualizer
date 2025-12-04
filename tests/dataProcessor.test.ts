@@ -1,4 +1,4 @@
-import assert from "assert";
+import { describe, it, expect } from "bun:test";
 import type { ChatData, ChatMessage } from "../types/chat.js";
 
 // Тестовые данные для chatData
@@ -15,7 +15,7 @@ describe("dataProcessor", () => {
     ];
 
     const users = extractUsers(chatData);
-    assert.deepStrictEqual(users, [
+    expect(users).toEqual([
       { id: "Alice", name: "Alice", messageCount: 2 },
       { id: "Bob", name: "Bob", messageCount: 1 },
     ]);
@@ -47,49 +47,49 @@ describe("dataProcessor", () => {
     const stats = generateUserStats(chatData, "user-1");
 
     // Проверка: stats не null
-    assert.ok(stats !== null, "stats should not be null");
+    expect(stats).not.toBeNull();
     if (!stats) return; // Type guard для TypeScript
 
     // Базовые поля
-    assert.strictEqual(stats.userId, "user-1");
-    assert.strictEqual(stats.totalMessages, 4);
+    expect(stats.userId).toBe("user-1");
+    expect(stats.totalMessages).toBe(4);
 
     // messagesByAuthor
-    assert.deepStrictEqual(stats.messagesByAuthor, { A: 2, B: 2 });
+    expect(stats.messagesByAuthor).toEqual({ A: 2, B: 2 });
 
     // frequentWords: проверка наличия ожидаемых слов и счётчиков
     const wordMap = Object.fromEntries(stats.frequentWords.map((x) => [x.word, x.count]));
     // ожидаем верхних частот
-    assert.strictEqual(wordMap["добрый"], 4);
-    assert.strictEqual(wordMap["день"], 4);
-    assert.strictEqual(wordMap["привет"], 2);
-    assert.strictEqual(wordMap["заходи"], 1);
+    expect(wordMap["добрый"]).toBe(4);
+    expect(wordMap["день"]).toBe(4);
+    expect(wordMap["привет"]).toBe(2);
+    expect(wordMap["заходи"]).toBe(1);
 
     // frequentWordPairs: должны остаться только пары с count > 1
     const pairMap = Object.fromEntries(stats.frequentWordPairs.map((x) => [x.pair, x.count]));
-    assert.strictEqual(pairMap["добрый день"], 4);
+    expect(pairMap["добрый день"]).toBe(4);
     // другие пары встречаются 1 раз и потому отфильтрованы
-    assert.strictEqual(Object.keys(pairMap).length, 1);
+    expect(Object.keys(pairMap).length).toBe(1);
 
     // dateStats: две даты (05 и 06 марта)
-    assert.ok(Array.isArray(stats.dateStats));
-    assert.strictEqual(stats.dateStats.length, 2);
+    expect(Array.isArray(stats.dateStats)).toBe(true);
+    expect(stats.dateStats.length).toBe(2);
     const dates = stats.dateStats.map((d) => d.date);
-    assert.ok(dates.includes("2025-03-05"));
-    assert.ok(dates.includes("2025-03-06"));
+    expect(dates).toContain("2025-03-05");
+    expect(dates).toContain("2025-03-06");
 
     // Среднее сообщений в день: 4 / 2 = 2.00
-    assert.strictEqual(stats.avgMessagesPerDay, 2);
+    expect(stats.avgMessagesPerDay).toBe(2);
 
     // Период чата заполнен
-    assert.ok(stats.chatPeriod.firstDate && stats.chatPeriod.firstDate !== "Н/Д");
-    assert.ok(stats.chatPeriod.lastDate && stats.chatPeriod.lastDate !== "Н/Д");
-    assert.strictEqual(stats.chatPeriod.totalDays, 2);
+    expect(stats.chatPeriod.firstDate && stats.chatPeriod.firstDate !== "Н/Д").toBe(true);
+    expect(stats.chatPeriod.lastDate && stats.chatPeriod.lastDate !== "Н/Д").toBe(true);
+    expect(stats.chatPeriod.totalDays).toBe(2);
 
     // Бакеты по дням недели и времени суток: сумма по каждому словарю равна totalMessages
     const sum = (obj: Record<string, number>): number =>
       Object.values(obj).reduce((a, b) => a + b, 0);
-    assert.strictEqual(sum(stats.messagesByWeekday), stats.totalMessages);
-    assert.strictEqual(sum(stats.messagesByTimeOfDay), stats.totalMessages);
+    expect(sum(stats.messagesByWeekday)).toBe(stats.totalMessages);
+    expect(sum(stats.messagesByTimeOfDay)).toBe(stats.totalMessages);
   });
 });

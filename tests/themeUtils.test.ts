@@ -1,4 +1,4 @@
-import assert from "assert";
+import { describe, it, expect } from "bun:test";
 import {
   resolveInitialTheme,
   nextTheme,
@@ -9,18 +9,18 @@ import type { DisplayModeFlags } from "../types/ui.js";
 
 describe("themeUtils (pure)", () => {
   it("resolveInitialTheme: при сохранённой теме возвращает её", () => {
-    assert.strictEqual(resolveInitialTheme("dark", false), "dark");
-    assert.strictEqual(resolveInitialTheme("light", true), "light");
+    expect(resolveInitialTheme("dark", false)).toBe("dark");
+    expect(resolveInitialTheme("light", true)).toBe("light");
   });
 
   it("resolveInitialTheme: без сохранённой темы учитывает системное предпочтение", () => {
-    assert.strictEqual(resolveInitialTheme(null, true), "dark");
-    assert.strictEqual(resolveInitialTheme(undefined, false), "light");
+    expect(resolveInitialTheme(null, true)).toBe("dark");
+    expect(resolveInitialTheme(undefined, false)).toBe("light");
   });
 
   it("nextTheme: переключает режим", () => {
-    assert.strictEqual(nextTheme("dark"), "light");
-    assert.strictEqual(nextTheme("light"), "dark");
+    expect(nextTheme("dark")).toBe("light");
+    expect(nextTheme("light")).toBe("dark");
   });
 
   it("computeChartDisplayMode: dark если есть класс или системный dark", () => {
@@ -28,18 +28,18 @@ describe("themeUtils (pure)", () => {
     const systemDarkOnly: DisplayModeFlags = { hasDarkClass: false, systemPrefersDark: true };
     const lightMode: DisplayModeFlags = { hasDarkClass: false, systemPrefersDark: false };
 
-    assert.strictEqual(computeChartDisplayMode(darkClassOnly), "dark");
-    assert.strictEqual(computeChartDisplayMode(systemDarkOnly), "dark");
-    assert.strictEqual(computeChartDisplayMode(lightMode), "light");
+    expect(computeChartDisplayMode(darkClassOnly)).toBe("dark");
+    expect(computeChartDisplayMode(systemDarkOnly)).toBe("dark");
+    expect(computeChartDisplayMode(lightMode)).toBe("light");
   });
 
   it("buildChartColorScheme: корректные цвета для light/dark", () => {
     const light = buildChartColorScheme("light");
-    assert.strictEqual(light.fontColor, "#333");
-    assert.strictEqual(light.backgroundColor, "#ffffff");
+    expect(light.fontColor).toBe("#333");
+    expect(light.backgroundColor).toBe("#ffffff");
 
     const dark = buildChartColorScheme("dark");
-    assert.strictEqual(dark.fontColor, "#e1e1e1");
-    assert.strictEqual(dark.backgroundColor, "#1e1e1e");
+    expect(dark.fontColor).toBe("#e1e1e1");
+    expect(dark.backgroundColor).toBe("#1e1e1e");
   });
 });

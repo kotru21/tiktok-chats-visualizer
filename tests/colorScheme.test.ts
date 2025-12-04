@@ -1,5 +1,6 @@
-import assert from "assert";
-import { JSDOM } from "jsdom";
+import { describe, it, expect, beforeEach } from "bun:test";
+
+// happy-dom регистрируется в tests/setup.ts через bunfig.toml preload
 
 interface SetupDomOptions {
   darkPreferred?: boolean;
@@ -7,50 +8,50 @@ interface SetupDomOptions {
 }
 
 // Хелпер для настройки окна и документа
-function setupDom({ darkPreferred = false, hasDarkClass = false }: SetupDomOptions = {}): JSDOM {
-  const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-    url: "http://localhost/",
-    pretendToBeVisual: true,
-  });
+function setupDom({ darkPreferred = false, hasDarkClass = false }: SetupDomOptions = {}): void {
+  // Сбрасываем состояние
+  document.body.className = "";
 
   // имитируем matchMedia
-  dom.window.matchMedia = ((query: string) => ({
+  window.matchMedia = ((query: string) => ({
     matches: query.includes("dark") ? darkPreferred : false,
     media: query,
     addEventListener: () => {},
     removeEventListener: () => {},
-  })) as unknown as typeof dom.window.matchMedia;
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => true,
+    onchange: null,
+  })) as typeof window.matchMedia;
 
-  if (hasDarkClass) dom.window.document.body.classList.add("dark-theme");
-  return dom;
+  if (hasDarkClass) document.body.classList.add("dark-theme");
 }
 
 describe("charts/colorScheme", () => {
-  it("должен возвращать светлую схему по умолчанию", async () => {
-    const dom = setupDom({ darkPreferred: false, hasDarkClass: false });
-    (global as unknown as { window: typeof dom.window }).window = dom.window;
-    (global as unknown as { document: typeof dom.window.document }).document = dom.window.document;
+  beforeEach(() => {
+    // Очищаем кеш модуля перед каждым тестом
+    delete require.cache[require.resolve("../public/js/charts/colorScheme.js")];
+  });
 
-    const { getChartColorScheme, invalidateChartColorCache } = await import(
-      "../public/js/charts/colorScheme.js"
-    );
+  it("должен возвращать светлую схему по умолчанию", async () => {
+    setupDom({ darkPreferred: false, hasDarkClass: false });
+
+    const { getChartColorScheme, invalidateChartColorCache } =
+      await import("../public/js/charts/colorScheme.js");
 
     invalidateChartColorCache();
     const scheme = getChartColorScheme();
-    assert.strictEqual(scheme.fontColor, "#333");
+    expect(scheme.fontColor).toBe("#333");
   });
 
   it("должен переключаться на тёмную схему при классе dark-theme", async () => {
-    const dom = setupDom({ darkPreferred: false, hasDarkClass: true });
-    (global as unknown as { window: typeof dom.window }).window = dom.window;
-    (global as unknown as { document: typeof dom.window.document }).document = dom.window.document;
+    setupDom({ darkPreferred: false, hasDarkClass: true });
 
-    const { getChartColorScheme, invalidateChartColorCache } = await import(
-      "../public/js/charts/colorScheme.js"
-    );
+    const { getChartColorScheme, invalidateChartColorCache } =
+      await import("../public/js/charts/colorScheme.js");
 
     invalidateChartColorCache();
     const scheme = getChartColorScheme();
-    assert.strictEqual(scheme.fontColor, "#e1e1e1");
+    expect(scheme.fontColor).toBe("#e1e1e1");
   });
 });

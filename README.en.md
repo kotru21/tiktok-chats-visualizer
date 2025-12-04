@@ -27,18 +27,28 @@ Tiktok Chats Visualizer is a web application for analyzing and visualizing chat 
 
 ## 🛠 Tech Stack
 
+- Runtime: [Bun](https://bun.sh) — ultra-fast JavaScript runtime
 - Frontend: HTML, CSS, TypeScript/JavaScript (ES6+ modules), Chart.js, Vite
 - Data Processing: Web Workers (background processing without blocking UI)
-- Testing: Mocha with ES modules
+- Testing: bun:test (built-in test runner)
 - Code Quality: ESLint, Prettier, TypeScript strict mode
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (version 18 or higher is recommended)
-- npm (bundled with Node.js)
+- [Bun](https://bun.sh) (version 1.0 or higher)
 - Exported TikTok messages in JSON format (see "How to use")
+
+### Installing Bun
+
+```bash
+# Windows (PowerShell)
+powershell -c "irm bun.sh/install.ps1|iex"
+
+# macOS/Linux
+curl -fsSL https://bun.sh/install | bash
+```
 
 ### Installation
 
@@ -54,31 +64,31 @@ Or download the source archive from GitHub.
 1. Install dependencies:
 
 ```bash
-npm install
+bun install
 ```
 
 1. Start the development server:
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 1. For production build:
 
 ```bash
-npm run build     # Build the project
-npm run preview   # Preview production build
+bun run build     # Build the project
+bun run preview   # Preview production build
 ```
 
 1. Open <http://localhost:3000> in your browser
 
 ## 🧪 Testing
 
-This project uses Mocha with ESM. Run tests with:
+This project uses Bun's built-in test runner. Run tests with:
 
 ```bash
-npm test         # Run TypeScript tests
-npm run test:js  # Run JavaScript tests (legacy)
+bun test              # Run all tests
+bun test --watch      # Watch mode
 ```
 
 Tests live under `tests/` and cover utilities:
@@ -102,10 +112,10 @@ The project uses TypeScript with strict type checking:
 
 ```bash
 # Type check
-npm run typecheck
+bun run typecheck
 
 # Type check client
-npm run typecheck:client
+bun run typecheck:client
 ```
 
 TypeScript configuration:
