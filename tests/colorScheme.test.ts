@@ -30,7 +30,8 @@ function setupDom({ darkPreferred = false, hasDarkClass = false }: SetupDomOptio
 describe("charts/colorScheme", () => {
   beforeEach(() => {
     // Очищаем кеш модуля перед каждым тестом
-    delete require.cache[require.resolve("../public/js/charts/colorScheme.js")];
+    const modulePath = require.resolve("../public/js/charts/colorScheme.js");
+    Reflect.deleteProperty(require.cache, modulePath);
   });
 
   it("должен возвращать светлую схему по умолчанию", async () => {

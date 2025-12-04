@@ -406,7 +406,7 @@ function generateUserStats(userId: string): UserStats | null {
 
 // === Обработчик сообщений ===
 
-self.onmessage = (e: MessageEvent<WorkerMessage>) => {
+self.onmessage = (e: MessageEvent<WorkerMessage>): void => {
   const { type, payload, id } = e.data;
 
   try {
@@ -422,8 +422,10 @@ self.onmessage = (e: MessageEvent<WorkerMessage>) => {
       case "getUserStats":
         result = generateUserStats(payload as string);
         break;
-      default:
-        throw new Error(`Неизвестный тип сообщения: ${type}`);
+      default: {
+        const exhaustiveCheck: never = type;
+        throw new Error(`Неизвестный тип сообщения: ${exhaustiveCheck as string}`);
+      }
     }
 
     const response: WorkerResponse = { type: "success", payload: result, id };

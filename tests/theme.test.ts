@@ -31,7 +31,8 @@ function setupDom({ prefersDark = false, storedTheme = null }: SetupDomOptions =
 describe("theme", () => {
   beforeEach(() => {
     // Очищаем кеш модуля перед каждым тестом
-    delete require.cache[require.resolve("../public/js/theme.js")];
+    const modulePath = require.resolve("../public/js/theme.js");
+    Reflect.deleteProperty(require.cache, modulePath);
   });
 
   it("detectColorScheme: должен уважать сохранённую тему", async () => {

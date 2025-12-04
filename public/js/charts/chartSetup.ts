@@ -16,7 +16,6 @@ import {
   Filler,
 } from "chart.js";
 
-// Регистрируем все необходимые компоненты
 Chart.register(
   CategoryScale,
   LinearScale,

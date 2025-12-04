@@ -64,12 +64,16 @@ function createAllCharts(stats: UserStats): void {
     (entries, obs) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
-          const canvas = entry.target.querySelector("canvas");
+          const container = entry.target as HTMLElement;
+          const canvas = container.querySelector("canvas");
           if (!canvas) continue;
           const job = jobs.find((j) => j.id === canvas.id);
           if (!job) continue;
           const chart = job.create();
           if (chart) chartRegistry.push(chart);
+          // Убираем индикатор загрузки после создания графика
+          const loadingEl = container.querySelector(".loading");
+          if (loadingEl) loadingEl.remove();
           obs.unobserve(entry.target);
         }
       }
@@ -137,22 +141,20 @@ export function renderStats(stats: UserStats): void {
 
   document.querySelector(".stat-card")?.classList.add("full-width-card");
 
-  // Обновление контейнеров
-  const frequentPairs = document.getElementById("frequent-pairs");
-  const weekdayActivity = document.getElementById("weekday-activity");
-  const timeOfDayActivity = document.getElementById("time-of-day-activity");
+  const chartContainers = [
+    { id: "frequent-pairs", canvasId: "pairs-chart" },
+    { id: "weekday-activity", canvasId: "weekday-chart" },
+    { id: "time-of-day-activity", canvasId: "time-of-day-chart" },
+    { id: "messages-by-author", canvasId: "author-chart" },
+    { id: "frequent-words", canvasId: "words-chart" },
+    { id: "date-activity", canvasId: "date-chart" },
+  ];
 
-  if (frequentPairs) {
-    frequentPairs.innerHTML =
-      "<canvas id=\"pairs-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
-  }
-  if (weekdayActivity) {
-    weekdayActivity.innerHTML =
-      "<canvas id=\"weekday-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
-  }
-  if (timeOfDayActivity) {
-    timeOfDayActivity.innerHTML =
-      "<canvas id=\"time-of-day-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
+  for (const { id, canvasId } of chartContainers) {
+    const container = document.getElementById(id);
+    if (container) {
+      container.innerHTML = `<canvas id="${canvasId}"></canvas><div class="loading"><div class="spinner"></div>Загрузка...</div>`;
+    }
   }
 
   // Уничтожаем предыдущие графики, если есть

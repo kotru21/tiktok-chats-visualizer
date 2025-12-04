@@ -38,7 +38,7 @@ function getWorker(): Worker {
       type: "module",
     });
 
-    worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
+    worker.onmessage = (e: MessageEvent<WorkerResponse>): void => {
       const { type, payload, id } = e.data;
       const pending = pendingRequests.get(id);
 
@@ -52,7 +52,7 @@ function getWorker(): Worker {
       }
     };
 
-    worker.onerror = (error) => {
+    worker.onerror = (error): void => {
       console.error("Worker error:", error);
     };
   }
@@ -123,9 +123,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   }
 
   const stats = await sendToWorker<UserStats>("getUserStats", userId);
-  if (stats) {
-    statsCache.set(userId, stats);
-  }
+  statsCache.set(userId, stats);
   return stats;
 }
 
