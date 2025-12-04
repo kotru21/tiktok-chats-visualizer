@@ -1,7 +1,7 @@
 /**
  * Датовые утилиты: день недели, время суток, форматирование.
+ * Без внешних зависимостей - используем встроенный Date API.
  */
-import moment from "moment";
 import type { WeekdayName, TimeOfDayBucket } from "../types/date.js";
 
 /**
@@ -49,12 +49,20 @@ export function getTimeOfDayBucket(date: Date): TimeOfDayBucket {
  * Форматирует timestamp в ISO формат даты (YYYY-MM-DD).
  */
 export function formatDateISO(ts: string | Date): string {
-  return moment(ts).format("YYYY-MM-DD");
+  const date = typeof ts === "string" ? new Date(ts) : ts;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 /**
  * Форматирует дату для отображения (DD.MM.YYYY).
  */
 export function formatDisplayDate(date: string | Date): string {
-  return moment(date).format("DD.MM.YYYY");
+  const d = typeof date === "string" ? new Date(date) : date;
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}.${month}.${year}`;
 }

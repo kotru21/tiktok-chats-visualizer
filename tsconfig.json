@@ -29,7 +29,7 @@
     "noEmit": true,
 
     // Типы
-    "types": ["node", "mocha"],
+    "types": ["mocha"],
 
     // Алиасы путей (baseUrl устарел в следующей версии TypeScript — используем только paths)
     "paths": {
@@ -38,7 +38,6 @@
     }
   },
   "include": [
-    "server.ts",
     "utils/**/*.ts",
     "public/js/**/*.ts",
     "types/**/*.ts",

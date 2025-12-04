@@ -11,7 +11,7 @@ Tiktok Chats Visualizer is a web application for analyzing and visualizing chat 
 ## ✨ Features
 
 - Upload and analyze JSON files with TikTok chat history
-- View a list of users you’ve chatted with
+- View a list of users you've chatted with
 - Detailed per-chat statistics:
   - Total message count
   - Average messages per day
@@ -27,11 +27,10 @@ Tiktok Chats Visualizer is a web application for analyzing and visualizing chat 
 
 ## 🛠 Tech Stack
 
-- Frontend: HTML, CSS, JavaScript (ES6+ modules), Chart.js
-- Backend: Node.js, Express
-- Additional libraries: Moment.js
+- Frontend: HTML, CSS, TypeScript/JavaScript (ES6+ modules), Chart.js, Vite
+- Data Processing: Web Workers (background processing without blocking UI)
 - Testing: Mocha with ES modules
-- Code Quality: ESLint, Prettier
+- Code Quality: ESLint, Prettier, TypeScript strict mode
 
 ## 🚀 Getting Started
 
@@ -39,8 +38,7 @@ Tiktok Chats Visualizer is a web application for analyzing and visualizing chat 
 
 - Node.js (version 18 or higher is recommended)
 - npm (bundled with Node.js)
-- Exported TikTok messages in JSON format (see “How to use”)
-- For production hosting, set `{ secure: true }` for sessions
+- Exported TikTok messages in JSON format (see "How to use")
 
 ### Installation
 
@@ -59,10 +57,17 @@ Or download the source archive from GitHub.
 npm install
 ```
 
-1. Start the server:
+1. Start the development server:
 
 ```bash
-npm start
+npm run dev
+```
+
+1. For production build:
+
+```bash
+npm run build     # Build the project
+npm run preview   # Preview production build
 ```
 
 1. Open <http://localhost:3000> in your browser
@@ -99,9 +104,6 @@ The project uses TypeScript with strict type checking:
 # Type check
 npm run typecheck
 
-# Type check server
-npm run typecheck:server
-
 # Type check client
 npm run typecheck:client
 ```
@@ -109,7 +111,6 @@ npm run typecheck:client
 TypeScript configuration:
 
 - `tsconfig.json` - IDE configuration
-- `tsconfig.server.json` - Node.js server config
 - `tsconfig.client.json` - Browser code config
 
 Shared types are in `types/`:
@@ -136,7 +137,7 @@ npm run format
 
 - All modules use ES6+ import/export with TypeScript
 - Client modules are organized by feature
-- Server utilities are isolated and easy to test
+- Web Worker handles data processing in background
 - Each module has a clear responsibility
 - Shared types are in `types/` directory
 
@@ -184,12 +185,14 @@ When contributing, follow these rules:
 │   │   │   └── userList.ts          # User list
 │   │   ├── utils/            # Client utilities
 │   │   │   └── themeUtils.ts        # Theme utilities
-│   │   ├── api.ts            # Server API
+│   │   ├── workers/          # Web Workers
+│   │   │   └── dataProcessor.worker.ts  # Data processing worker
+│   │   ├── api.ts            # Worker communication API
 │   │   ├── charts.ts         # Charts orchestrator
 │   │   ├── config.ts         # App config
 │   │   ├── main.ts           # App entry point
 │   │   ├── theme.ts          # Theme management
-│   │   └── uploader.ts       # File upload & parsing
+│   │   └── uploader.ts       # File upload handling
 │   └── index.html            # Main page
 ├── types/                    # Shared TypeScript types
 │   ├── chat.ts               # Message and chat types
@@ -197,7 +200,7 @@ When contributing, follow these rules:
 │   ├── stats.ts              # Statistics types
 │   ├── ui.ts                 # UI component types
 │   └── index.ts              # Re-export all types
-├── utils/                    # Server utilities
+├── utils/                    # Data processing utilities
 │   ├── dataProcessor.ts      # Chat data processing
 │   ├── dateUtils.ts          # Date helpers
 │   ├── statsUtils.ts         # Statistics helpers
@@ -213,12 +216,9 @@ When contributing, follow these rules:
 │   ├── theme.test.ts
 │   └── themeUtils.test.ts
 ├── dist/                     # Compiled code (gitignore)
-│   ├── server/               # Server code
 │   └── client/               # Client bundle
-├── server.ts                 # Express server
 ├── vite.config.ts            # Vite configuration
 ├── tsconfig.json             # Main TypeScript config
-├── tsconfig.server.json      # Server TypeScript config
 ├── tsconfig.client.json      # Client TypeScript config
 ├── package.json              # Dependencies & scripts
 ├── eslint.config.js          # ESLint config
@@ -227,29 +227,29 @@ When contributing, follow these rules:
 
 ## 🏗 Architecture
 
-The project follows a modular architecture with clear separation of concerns.
+The project follows a client-only modular architecture.
 
 ### Frontend (TypeScript + Vite)
 
 - **charts/** – specialized modules for each chart type
 - **ui/** – UI components
 - **utils/** – client-side helpers
+- **workers/** – Web Workers for background data processing
 - **main.ts** – entry point that coordinates modules
 - Vite provides hot-reload and optimized builds
 
-### Backend (TypeScript + Node.js)
+### Data Processing (Web Worker)
 
-- **utils/** – server-side utilities for data processing
-- **server.ts** – Express server with API endpoints
-- tsx for running TypeScript directly
+- **dataProcessor.worker.ts** – processes chat data in a separate thread
+- Doesn't block UI when loading large files
+- All data is processed locally in the browser
 
 ### Types (Shared types)
 
-- **types/** – interfaces and types used on server and client
+- **types/** – interfaces and types for the entire application
 - Strict typing with `strict: true`
 
 ### Testing
 
 - Extensive tests for all utilities
 - ESM support in tests
-- Separate tests for client and server components

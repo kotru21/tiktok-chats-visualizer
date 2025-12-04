@@ -10,19 +10,14 @@ export default defineConfig({
 
   // Настройки dev-сервера
   server: {
-    port: 3001,
+    port: 3000,
     strictPort: false,
-    // Проксирование API запросов на Express сервер
-    proxy: {
-      "/api": {
-        target: "http://localhost:3000",
-        changeOrigin: true,
-      },
-      "/upload": {
-        target: "http://localhost:3000",
-        changeOrigin: true,
-      },
-    },
+    open: true,
+  },
+
+  // Настройки Worker
+  worker: {
+    format: "es",
   },
 
   // Настройки сборки
