@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    // Настройки для IDE - объединяем оба контекста
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+
+    // Строгая типизация
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Совместимость модулей
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Разрешаем JS для постепенной миграции
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+
+    // Типы
+    "types": ["node", "mocha"],
+
+    // Алиасы путей (baseUrl устарел в следующей версии TypeScript — используем только paths)
+    "paths": {
+      "@/*": ["./public/js/*"],
+      "@types/*": ["./types/*"]
+    }
+  },
+  "include": [
+    "server.ts",
+    "utils/**/*.ts",
+    "public/js/**/*.ts",
+    "types/**/*.ts",
+    "tests/**/*.ts",
+    "vite.config.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

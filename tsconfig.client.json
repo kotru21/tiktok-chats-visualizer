@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // Целевая платформа - современные браузеры
+    "target": "ES2021",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
+    // Библиотеки для браузера
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "types": [],
+
+    // Пути
+    "rootDir": ".",
+    "outDir": "./dist/client",
+    "paths": {
+      "@/*": ["./public/js/*"],
+      "@types/*": ["./types/*"]
+    },
+
+    // Для project references
+    "composite": true,
+    "declarationDir": "./dist/client/types",
+
+    // Разрешаем JS для постепенной миграции
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["public/js/**/*.ts", "types/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

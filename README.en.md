@@ -72,23 +72,52 @@ npm start
 This project uses Mocha with ESM. Run tests with:
 
 ```bash
-npm test
+npm test         # Run TypeScript tests
+npm run test:js  # Run JavaScript tests (legacy)
 ```
 
 Tests live under `tests/` and cover utilities:
 
-- `utils/dateUtils.js` – date helpers
-- `utils/statsUtils.js` – statistics helpers
-- `utils/textUtils.js` – text processing helpers
-- `utils/stopWords.js` – stop words filtering
-- `utils/dataProcessor.js` – chat data processing
-- `public/js/charts/colorScheme.js` – chart color schemes
-- `public/js/theme.js` – theme management
-- `public/js/utils/themeUtils.js` – theme utilities
+- `utils/dateUtils` – date helpers
+- `utils/statsUtils` – statistics helpers
+- `utils/textUtils` – text processing helpers
+- `utils/stopWords` – stop words filtering
+- `utils/dataProcessor` – chat data processing
+- `public/js/charts/colorScheme` – chart color schemes
+- `public/js/theme` – theme management
+- `public/js/utils/themeUtils` – theme utilities
 
-If you add new utilities, create corresponding `*.test.js` files under `tests/`.
+If you add new utilities, create corresponding `*.test.ts` files under `tests/`.
 
 ## 💻 Development
+
+### TypeScript
+
+The project uses TypeScript with strict type checking:
+
+```bash
+# Type check
+npm run typecheck
+
+# Type check server
+npm run typecheck:server
+
+# Type check client
+npm run typecheck:client
+```
+
+TypeScript configuration:
+
+- `tsconfig.json` - IDE configuration
+- `tsconfig.server.json` - Node.js server config
+- `tsconfig.client.json` - Browser code config
+
+Shared types are in `types/`:
+
+- `chat.ts` - message and chat types
+- `stats.ts` - statistics types
+- `date.ts` - date types
+- `ui.ts` - UI component types
 
 ### Code Quality
 
@@ -96,16 +125,30 @@ If you add new utilities, create corresponding `*.test.js` files under `tests/`.
 # Lint
 npm run lint
 
+# Auto-fix
+npm run lint:fix
+
 # Format with Prettier
 npm run format
 ```
 
 ### Module Structure
 
-- All modules use ES6 import/export
+- All modules use ES6+ import/export with TypeScript
 - Client modules are organized by feature
 - Server utilities are isolated and easy to test
 - Each module has a clear responsibility
+- Shared types are in `types/` directory
+
+### TypeScript Conventions
+
+When contributing, follow these rules:
+
+1. **Avoid `any`** - use `unknown` where needed
+2. **Explicit return types** - specify return type for functions
+3. **Interfaces for objects** - create interfaces in `types/`
+4. **Strict null checks** - always check nullable values
+5. **Literal types** - use `as const` for constants
 
 ## 📖 How to use
 
@@ -129,41 +172,54 @@ npm run format
 │   │   └── style.css         # Main styles
 │   ├── js/
 │   │   ├── charts/           # Chart modules
-│   │   │   ├── authorChart.js       # Author distribution chart
-│   │   │   ├── colorScheme.js       # Color schemes
-│   │   │   ├── dateChart.js         # Activity by date
-│   │   │   ├── pairsChart.js        # Frequent bigrams chart
-│   │   │   ├── timeOfDayChart.js    # Activity by time of day
-│   │   │   ├── weekdayChart.js      # Activity by weekday
-│   │   │   └── wordsChart.js        # Frequent words chart
+│   │   │   ├── authorChart.ts       # Author distribution chart
+│   │   │   ├── colorScheme.ts       # Color schemes
+│   │   │   ├── dateChart.ts         # Activity by date
+│   │   │   ├── pairsChart.ts        # Frequent bigrams chart
+│   │   │   ├── timeOfDayChart.ts    # Activity by time of day
+│   │   │   ├── weekdayChart.ts      # Activity by weekday
+│   │   │   └── wordsChart.ts        # Frequent words chart
 │   │   ├── ui/               # UI modules
-│   │   │   ├── statsView.js         # Statistics view
-│   │   │   └── userList.js          # User list
+│   │   │   ├── statsView.ts         # Statistics view
+│   │   │   └── userList.ts          # User list
 │   │   ├── utils/            # Client utilities
-│   │   │   └── themeUtils.js        # Theme utilities
-│   │   ├── api.js            # Server API
-│   │   ├── charts.js         # Charts orchestrator
-│   │   ├── config.js         # App config
-│   │   ├── main.js           # App entry point
-│   │   ├── theme.js          # Theme management
-│   │   └── uploader.js       # File upload & parsing
+│   │   │   └── themeUtils.ts        # Theme utilities
+│   │   ├── api.ts            # Server API
+│   │   ├── charts.ts         # Charts orchestrator
+│   │   ├── config.ts         # App config
+│   │   ├── main.ts           # App entry point
+│   │   ├── theme.ts          # Theme management
+│   │   └── uploader.ts       # File upload & parsing
 │   └── index.html            # Main page
+├── types/                    # Shared TypeScript types
+│   ├── chat.ts               # Message and chat types
+│   ├── date.ts               # Date types
+│   ├── stats.ts              # Statistics types
+│   ├── ui.ts                 # UI component types
+│   └── index.ts              # Re-export all types
 ├── utils/                    # Server utilities
-│   ├── dataProcessor.js      # Chat data processing
-│   ├── dateUtils.js          # Date helpers
-│   ├── statsUtils.js         # Statistics helpers
-│   ├── stopWords.js          # Stop words filtering
-│   └── textUtils.js          # Text processing
+│   ├── dataProcessor.ts      # Chat data processing
+│   ├── dateUtils.ts          # Date helpers
+│   ├── statsUtils.ts         # Statistics helpers
+│   ├── stopWords.ts          # Stop words filtering
+│   └── textUtils.ts          # Text processing
 ├── tests/                    # Tests
-│   ├── colorScheme.test.js
-│   ├── dataProcessor.test.js
-│   ├── dateUtils.test.js
-│   ├── statsUtils.test.js
-│   ├── stopWords.test.js
-│   ├── textUtils.test.js
-│   ├── theme.test.js
-│   └── themeUtils.test.js
-├── server.js                 # Express server
+│   ├── colorScheme.test.ts
+│   ├── dataProcessor.test.ts
+│   ├── dateUtils.test.ts
+│   ├── statsUtils.test.ts
+│   ├── stopWords.test.ts
+│   ├── textUtils.test.ts
+│   ├── theme.test.ts
+│   └── themeUtils.test.ts
+├── dist/                     # Compiled code (gitignore)
+│   ├── server/               # Server code
+│   └── client/               # Client bundle
+├── server.ts                 # Express server
+├── vite.config.ts            # Vite configuration
+├── tsconfig.json             # Main TypeScript config
+├── tsconfig.server.json      # Server TypeScript config
+├── tsconfig.client.json      # Client TypeScript config
 ├── package.json              # Dependencies & scripts
 ├── eslint.config.js          # ESLint config
 └── README.md                 # Documentation
@@ -173,17 +229,24 @@ npm run format
 
 The project follows a modular architecture with clear separation of concerns.
 
-### Frontend (ES6 modules)
+### Frontend (TypeScript + Vite)
 
-- charts/ – specialized modules for each chart type
-- ui/ – UI components
-- utils/ – client-side helpers
-- main.js – entry point that coordinates modules
+- **charts/** – specialized modules for each chart type
+- **ui/** – UI components
+- **utils/** – client-side helpers
+- **main.ts** – entry point that coordinates modules
+- Vite provides hot-reload and optimized builds
 
-### Backend
+### Backend (TypeScript + Node.js)
 
-- utils/ – server-side utilities for data processing
-- server.js – Express server with API endpoints
+- **utils/** – server-side utilities for data processing
+- **server.ts** – Express server with API endpoints
+- tsx for running TypeScript directly
+
+### Types (Shared types)
+
+- **types/** – interfaces and types used on server and client
+- Strict typing with `strict: true`
 
 ### Testing
 
