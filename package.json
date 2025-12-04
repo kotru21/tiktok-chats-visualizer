@@ -1,6 +1,6 @@
 {
   "name": "chat-analyzer",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "type": "module",
   "main": "dist/server/server.js",
   "scripts": {
@@ -26,32 +26,32 @@
   "license": "ISC",
   "description": "Анализатор и визуализатор чатов TikTok",
   "dependencies": {
-    "chart.js": "^4.4.8",
-    "express": "^5.1.0",
-    "express-session": "^1.18.1",
+    "chart.js": "^4.5.1",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
     "moment": "^2.30.1",
     "multer": "^2.0.2",
     "stream-chain": "^3.4.0",
     "stream-json": "^1.9.1",
-    "uuid": "^11.1.0"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/express-session": "^1.18.1",
-    "@types/jsdom": "^21.1.7",
+    "@types/express": "^5.0.6",
+    "@types/express-session": "^1.18.2",
+    "@types/jsdom": "^27.0.0",
     "@types/mocha": "^10.0.10",
-    "@types/multer": "^1.4.12",
-    "@types/node": "^22.10.1",
-    "concurrently": "^9.1.0",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.10.1",
+    "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
-    "eslint": "^9.12.0",
-    "globals": "^15.11.0",
-    "jsdom": "^25.0.0",
-    "mocha": "^10.7.3",
-    "prettier": "^3.3.3",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "typescript-eslint": "^8.18.0",
-    "vite": "^6.0.3"
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "jsdom": "^27.2.0",
+    "mocha": "^11.7.5",
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.1",
+    "vite": "^7.2.6"
   }
 }
