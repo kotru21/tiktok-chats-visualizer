@@ -1,12 +1,3 @@
-/**
- * Утилиты для оптимизации производительности
- */
-
-/**
- * Создаёт debounced версию функции
- * @param fn - функция для обёртки
- * @param delay - задержка в миллисекундах
- */
 export function debounce<T extends (...args: Parameters<T>) => void>(
   fn: T,
   delay: number
@@ -24,11 +15,6 @@ export function debounce<T extends (...args: Parameters<T>) => void>(
   };
 }
 
-/**
- * Создаёт throttled версию функции
- * @param fn - функция для обёртки
- * @param limit - минимальный интервал между вызовами в миллисекундах
- */
 export function throttle<T extends (...args: Parameters<T>) => void>(
   fn: T,
   limit: number
@@ -43,23 +29,18 @@ export function throttle<T extends (...args: Parameters<T>) => void>(
       lastCall = now;
       fn(...args);
     } else {
-      timeoutId ??=
-        // Планирование вызова в конец интервала
-        timeoutId = setTimeout(
-          () => {
-            lastCall = Date.now();
-            fn(...args);
-            timeoutId = null;
-          },
-          limit - (now - lastCall)
-        );
+      timeoutId ??= setTimeout(
+        () => {
+          lastCall = Date.now();
+          fn(...args);
+          timeoutId = null;
+        },
+        limit - (now - lastCall)
+      );
     }
   };
 }
 
-/**
- * Простой LRU (Least Recently Used) кеш
- */
 export class LRUCache<K, V> {
   private cache = new Map<K, V>();
   private readonly maxSize: number;
@@ -71,7 +52,6 @@ export class LRUCache<K, V> {
   get(key: K): V | undefined {
     const value = this.cache.get(key);
     if (value !== undefined) {
-      // Перемещение в конец (самый свежий)
       this.cache.delete(key);
       this.cache.set(key, value);
     }
@@ -82,7 +62,6 @@ export class LRUCache<K, V> {
     if (this.cache.has(key)) {
       this.cache.delete(key);
     } else if (this.cache.size >= this.maxSize) {
-      // Удаление самого старого элемента (первый в Map)
       const firstKey = this.cache.keys().next().value as K;
       this.cache.delete(firstKey);
     }
@@ -102,12 +81,6 @@ export class LRUCache<K, V> {
   }
 }
 
-/**
- * Мемоизированная функция с LRU кешем
- * @param fn - чистая функция для мемоизации
- * @param maxSize - максимальный размер кеша
- * @param keyFn - функция генерации ключа кеша (по умолчанию JSON.stringify)
- */
 export function memoize<Args extends unknown[], R>(
   fn: (...args: Args) => R,
   maxSize = 100,
@@ -132,9 +105,6 @@ export function memoize<Args extends unknown[], R>(
   return memoized;
 }
 
-/**
- * Асинхронная мемоизированная функция
- */
 export function memoizeAsync<Args extends unknown[], R>(
   fn: (...args: Args) => Promise<R>,
   maxSize = 50,
@@ -146,19 +116,16 @@ export function memoizeAsync<Args extends unknown[], R>(
   const memoized = async (...args: Args): Promise<R> => {
     const key = keyFn(...args);
 
-    // Проверка кеша
     const cached = cache.get(key);
     if (cached !== undefined) {
       return cached;
     }
 
-    // Проверка pending запросов (дедупликация)
     const pendingRequest = pending.get(key);
     if (pendingRequest) {
       return pendingRequest;
     }
 
-    // Создание нового запроса
     const request = fn(...args)
       .then((result) => {
         cache.set(key, result);
@@ -183,9 +150,6 @@ export function memoizeAsync<Args extends unknown[], R>(
   return memoized;
 }
 
-/**
- * Группирует множественные вызовы в один микротаск
- */
 export function batch<T>(fn: (items: T[]) => void): (item: T) => void {
   let queue: T[] = [];
   let scheduled = false;

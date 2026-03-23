@@ -27,7 +27,7 @@ export function createWeekdayChart(
         {
           label: "Количество сообщений",
           data: values,
-          backgroundColor: "#ee1d52",
+          backgroundColor: colorScheme.barFill,
           borderWidth: 1,
         },
       ],

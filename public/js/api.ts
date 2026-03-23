@@ -1,13 +1,6 @@
 import type { User, UploadResult } from "../../types/chat.js";
 import type { UserStats } from "../../types/stats.js";
 
-/**
- * Модуль API для работы с данными чатов TikTok.
- * Использует Web Worker для обработки данных в отдельном потоке.
- */
-
-// === Типы для Worker ===
-
 interface WorkerMessage {
   type: "parse" | "getUsers" | "getUserStats";
   payload?: unknown;
@@ -20,8 +13,6 @@ interface WorkerResponse {
   id: number;
 }
 
-// === Инициализация Worker ===
-
 let worker: Worker | null = null;
 let messageId = 0;
 const pendingRequests = new Map<
@@ -29,9 +20,6 @@ const pendingRequests = new Map<
   { resolve: (value: unknown) => void; reject: (error: Error) => void }
 >();
 
-/**
- * Инициализирует Web Worker для обработки данных
- */
 function getWorker(): Worker {
   if (!worker) {
     worker = new Worker(new URL("./workers/dataProcessor.worker.ts", import.meta.url), {
@@ -60,9 +48,6 @@ function getWorker(): Worker {
   return worker;
 }
 
-/**
- * Отправляет сообщение Worker и ждёт ответа
- */
 function sendToWorker<T>(type: WorkerMessage["type"], payload?: unknown): Promise<T> {
   return new Promise((resolve, reject) => {
     const id = ++messageId;
@@ -76,33 +61,17 @@ function sendToWorker<T>(type: WorkerMessage["type"], payload?: unknown): Promis
   });
 }
 
-// === Кеш ===
-
 let cachedUsers: User[] | null = null;
 const statsCache = new Map<string, UserStats>();
 
-/**
- * Загружает и парсит файл чата TikTok
- * Обработка происходит в Web Worker
- */
 export async function uploadFile(file: File): Promise<UploadResult> {
-  // Очищаем кеш при загрузке нового файла
   clearApiCache();
-
-  // Читаем файл
   const fileContent = await file.text();
-
-  // Парсим в Worker
   const result = await sendToWorker<UploadResult>("parse", fileContent);
-
   return result;
 }
 
-/**
- * Получает список пользователей из загруженных данных
- */
 export async function getUsers(): Promise<User[]> {
-  // Проверяем кеш
   if (cachedUsers) {
     return cachedUsers;
   }
@@ -112,11 +81,7 @@ export async function getUsers(): Promise<User[]> {
   return users;
 }
 
-/**
- * Получает статистику по конкретному пользователю
- */
 export async function getUserStats(userId: string): Promise<UserStats> {
-  // Проверяем кеш
   const cached = statsCache.get(userId);
   if (cached) {
     return cached;
@@ -127,10 +92,6 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   return stats;
 }
 
-/**
- * Очищает весь кеш
- * Вызывается после загрузки нового файла
- */
 export function clearApiCache(): void {
   cachedUsers = null;
   statsCache.clear();

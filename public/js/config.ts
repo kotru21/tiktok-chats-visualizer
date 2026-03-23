@@ -1,6 +1,5 @@
 import type { WeekdayName, TimeOfDayBucket } from "../../types/date.js";
 
-// Общие константы конфигурации фронтенда
 export const CHART_TOP_N_WORDS = 10 as const;
 export const CHART_TOP_N_PAIRS = 10 as const;
 

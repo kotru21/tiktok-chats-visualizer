@@ -5,7 +5,7 @@ let cachedScheme: ChartColorScheme | null = null;
 let cachedMode: Theme | null = null;
 
 function computeMode(): Theme {
-  const hasDarkClass = document.body.classList.contains("dark-theme");
+  const hasDarkClass = document.documentElement.classList.contains("dark-theme");
   const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   return computeChartDisplayMode({ hasDarkClass, systemPrefersDark });
 }

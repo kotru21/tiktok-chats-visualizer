@@ -35,11 +35,14 @@ describe("themeUtils (pure)", () => {
 
   it("buildChartColorScheme: корректные цвета для light/dark", () => {
     const light = buildChartColorScheme("light");
-    expect(light.fontColor).toBe("#333");
+    expect(light.fontColor).toBe("#0a0a0a");
     expect(light.backgroundColor).toBe("#ffffff");
+    expect(light.barFill).toBe("#404040");
+    expect(light.pieColors.length).toBeGreaterThan(0);
 
     const dark = buildChartColorScheme("dark");
-    expect(dark.fontColor).toBe("#e1e1e1");
-    expect(dark.backgroundColor).toBe("#1e1e1e");
+    expect(dark.fontColor).toBe("#fafafa");
+    expect(dark.backgroundColor).toBe("#0a0a0a");
+    expect(dark.barFill).toBe("#737373");
   });
 });

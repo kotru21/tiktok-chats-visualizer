@@ -15,6 +15,9 @@ export function createAuthorChart(canvasId: string, data: FrequencyMap): Chart<"
   const values = Object.values(data);
   const colorScheme = getChartColorScheme();
 
+  const pie = colorScheme.pieColors;
+  const sliceColors = labels.map((_, i) => pie[i % pie.length] ?? pie[0] ?? "#737373");
+
   return new Chart(ctx, {
     type: "pie",
     data: {
@@ -22,7 +25,7 @@ export function createAuthorChart(canvasId: string, data: FrequencyMap): Chart<"
       datasets: [
         {
           data: values,
-          backgroundColor: ["#4a6fa5", "#ff7675", "#fdcb6e", "#00cec9", "#6c5ce7"],
+          backgroundColor: sliceColors,
           borderWidth: 1,
         },
       ],

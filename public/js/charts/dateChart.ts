@@ -23,8 +23,8 @@ export function createDateChart(canvasId: string, data: DateStat[]): Chart<"line
         {
           label: "Количество сообщений",
           data: values,
-          backgroundColor: "rgba(74, 111, 165, 0.2)",
-          borderColor: "#4a6fa5",
+          backgroundColor: colorScheme.lineFill,
+          borderColor: colorScheme.lineBorder,
           borderWidth: 2,
           tension: 0.1,
           fill: true,

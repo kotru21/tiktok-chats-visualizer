@@ -1,4 +1,3 @@
-// Регистрация Chart.js компонентов
 import {
   Chart,
   CategoryScale,
@@ -31,5 +30,7 @@ Chart.register(
   Tooltip,
   Filler
 );
+
+Chart.defaults.animation = false;
 
 export { Chart };

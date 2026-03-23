@@ -8,7 +8,7 @@ import {
 
 describe("dateUtils", () => {
   it("getWeekdayName should map day index", () => {
-    const d = new Date("2024-12-01T10:00:00Z"); // Sunday
+    const d = new Date("2024-12-01T10:00:00Z");
     expect(getWeekdayName(d)).toBe("Воскресенье");
   });
 

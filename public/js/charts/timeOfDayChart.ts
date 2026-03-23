@@ -17,8 +17,9 @@ export function createTimeOfDayChart(
 
   const labels = [...TIME_OF_DAY_ORDER];
   const values = TIME_OF_DAY_ORDER.map((time) => data[time]);
-  const backgroundColors = ["#fdcb6e", "#74b9ff", "#6c5ce7", "#2d3436"];
   const colorScheme = getChartColorScheme();
+  const pie = colorScheme.timePieColors;
+  const backgroundColors = labels.map((_, i) => pie[i % pie.length] ?? pie[0] ?? "#737373");
 
   return new Chart(ctx, {
     type: "pie",

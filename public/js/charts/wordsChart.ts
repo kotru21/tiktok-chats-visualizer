@@ -30,7 +30,7 @@ export function createWordsChart(canvasId: string, data: WordFrequency[]): Chart
         {
           label: "Частота использования",
           data: values,
-          backgroundColor: "#4a6fa5",
+          backgroundColor: colorScheme.barFill,
           borderWidth: 1,
         },
       ],

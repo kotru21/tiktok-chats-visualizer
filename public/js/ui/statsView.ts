@@ -17,16 +17,15 @@ interface ChartJob {
   create: () => ChartInstance | null;
 }
 
-// Реестр активных графиков для корректного уничтожения/пересоздания
 let chartRegistry: ChartInstance[] = [];
+
+let chartObserver: IntersectionObserver | null = null;
 
 function destroyCharts(): void {
   chartRegistry.forEach((chart) => {
     try {
       chart.destroy();
-    } catch {
-      // Игнорирование ошибок при уничтожении
-    }
+    } catch {}
   });
   chartRegistry = [];
 }
@@ -59,8 +58,9 @@ function createAllCharts(stats: UserStats): void {
     },
   ];
 
-  // Ленивая инициализация с IntersectionObserver
-  const observer = new IntersectionObserver(
+  chartObserver?.disconnect();
+
+  chartObserver = new IntersectionObserver(
     (entries, obs) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
@@ -71,17 +71,15 @@ function createAllCharts(stats: UserStats): void {
           if (!job) continue;
           const chart = job.create();
           if (chart) chartRegistry.push(chart);
-          // Убираем индикатор загрузки после создания графика
           const loadingEl = container.querySelector(".loading");
           if (loadingEl) loadingEl.remove();
           obs.unobserve(entry.target);
         }
       }
     },
-    { root: null, rootMargin: "0px", threshold: 0.2 }
+    { root: null, rootMargin: "80px 0px", threshold: 0.05 }
   );
 
-  // Подписка на карточки-контейнеры с графиками
   const containers = [
     document.getElementById("messages-by-author"),
     document.getElementById("frequent-words"),
@@ -90,13 +88,11 @@ function createAllCharts(stats: UserStats): void {
     document.getElementById("weekday-activity"),
     document.getElementById("time-of-day-activity"),
   ];
-  containers.forEach((container) => container && observer.observe(container));
+  containers.forEach((container) => container && chartObserver?.observe(container));
 }
 
-// Хранение последних статистик для пересоздания при смене темы
 let lastStats: UserStats | null = null;
 
-// Подписка на смену темы: пересоздание графиков для обновления цветов
 window.addEventListener("theme:changed", () => {
   if (!lastStats) return;
   invalidateChartColorCache();
@@ -105,7 +101,6 @@ window.addEventListener("theme:changed", () => {
 });
 
 export function renderStats(stats: UserStats): void {
-  // Общая карточка
   const myMessageAuthor = Object.keys(stats.messagesByAuthor).find(
     (author) => author !== stats.userId && author !== "TikTok"
   );
@@ -157,12 +152,7 @@ export function renderStats(stats: UserStats): void {
     }
   }
 
-  // Уничтожаем предыдущие графики, если есть
   destroyCharts();
-
-  // Создание графиков (ленивое отображение)
   createAllCharts(stats);
-
-  // Сохранение последних данных статистики
   lastStats = stats;
 }

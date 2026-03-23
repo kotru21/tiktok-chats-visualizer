@@ -1,7 +1,3 @@
-/**
- * Наборы стоп-слов для русского языка.
- */
-
 export const baseStopWords: readonly string[] = [
   "это",
   "как",
@@ -38,8 +34,4 @@ export const additionalStopWords: readonly string[] = [
 
 export const allStopWords: readonly string[] = [...baseStopWords, ...additionalStopWords];
 
-/**
- * Предварительно созданный Set стоп-слов для O(1) поиска
- * Создаётся один раз при импорте модуля
- */
 export const stopWordsSet: ReadonlySet<string> = new Set(allStopWords);

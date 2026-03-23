@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    // Строгая типизация
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -10,8 +9,6 @@
     "noImplicitThis": true,
     "useUnknownInCatchVariables": true,
     "alwaysStrict": true,
-
-    // Дополнительные проверки
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
@@ -19,15 +16,11 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
-
-    // Модули и совместимость
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-
-    // Вывод
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

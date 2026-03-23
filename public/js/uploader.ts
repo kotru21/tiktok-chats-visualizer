@@ -8,7 +8,6 @@ export function setupUploader({ onUploaded }: UploaderOptions = {}): void {
   const fileText = document.querySelector(".file-text");
   const fileLabel = document.querySelector(".file-label");
 
-  // DnD overlay
   let dragCounter = 0;
   const ensureOverlay = (): HTMLElement => {
     let overlay = document.getElementById("dnd-overlay");
@@ -59,20 +58,17 @@ export function setupUploader({ onUploaded }: UploaderOptions = {}): void {
     }
   };
 
-  // Автозапуск при ручном выборе
   chatFileInput.addEventListener("change", () => {
     const file = chatFileInput.files?.[0];
     void handleFile(file);
   });
 
-  // Сабмит формы (на всякий случай)
   uploadForm.addEventListener("submit", (e: Event) => {
     e.preventDefault();
     const file = chatFileInput.files?.[0];
     void handleFile(file);
   });
 
-  // Drag & Drop
   const preventDefaults = (e: Event): void => {
     e.preventDefault();
     e.stopPropagation();
@@ -125,7 +121,6 @@ export function setupUploader({ onUploaded }: UploaderOptions = {}): void {
     void handleFile(file);
   });
 
-  // Глобальные события для оверлея и дропа «куда угодно»
   window.addEventListener("dragenter", (_e) => {
     dragCounter++;
     const overlay = ensureOverlay();
@@ -148,7 +143,6 @@ export function setupUploader({ onUploaded }: UploaderOptions = {}): void {
     dragCounter = 0;
     const overlay = ensureOverlay();
     overlay.classList.remove("visible");
-    // Если дропнули внутрь формы, локальный обработчик справится
     const target = e.target as Node;
     if (uploadForm.contains(target)) return;
     const files = e.dataTransfer?.files;
@@ -165,16 +159,13 @@ export function setupUploader({ onUploaded }: UploaderOptions = {}): void {
     void handleFile(file);
   });
 
-  // Вставка из буфера обмена: поддержка JSON-текста или файла
   window.addEventListener("paste", (e: ClipboardEvent) => {
-    // Не перехватываем, если фокус на инпуте/текстареа/контент-эдитабл
     const ae = document.activeElement as HTMLElement | null;
     const isEditable =
       ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA" || ae.isContentEditable);
     if (isEditable) return;
 
     const items = Array.from(e.clipboardData?.items ?? []);
-    // Пробуем как файл
     const fileItem = items.find((it) => it.kind === "file");
     if (fileItem) {
       const file = fileItem.getAsFile();
@@ -183,7 +174,6 @@ export function setupUploader({ onUploaded }: UploaderOptions = {}): void {
         return;
       }
     }
-    // Пробуем как текст JSON
     const text = e.clipboardData?.getData("text");
     if (text) {
       try {
@@ -194,13 +184,9 @@ export function setupUploader({ onUploaded }: UploaderOptions = {}): void {
           const dtAssign = new DataTransfer();
           dtAssign.items.add(file);
           chatFileInput.files = dtAssign.files;
-        } catch {
-          // Игнорирование ошибок при назначении файлов
-        }
+        } catch {}
         void handleFile(file);
-      } catch {
-        // не JSON — игнорирование
-      }
+      } catch {}
     }
   });
 }

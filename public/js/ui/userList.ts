@@ -37,7 +37,6 @@ export function renderUserList(
     });
   });
 
-  // Клавиатурная навигация: стрелки и Enter
   container.addEventListener("keydown", (e: KeyboardEvent) => {
     const items = Array.from(container.querySelectorAll<HTMLElement>(".user-item")).filter(
       (el) => el.style.display !== "none"

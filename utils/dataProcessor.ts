@@ -1,9 +1,3 @@
-/**
- * Модуль для обработки и анализа данных чатов TikTok.
- * Публичный API:
- *  - extractUsers(chatData)
- *  - generateUserStats(chatData, userId)
- */
 import { stopWordsSet } from "./stopWords.js";
 import { removeUrls, normalizeText, splitWords, filterWords, getBigrams } from "./textUtils.js";
 import {
@@ -23,10 +17,6 @@ import type {
 } from "../types/stats.js";
 import type { WeekdayName, TimeOfDayBucket } from "../types/date.js";
 
-/**
- * Извлекает список уникальных пользователей из массива данных чатов.
- * Для каждого пользователя вычисляется общее количество сообщений.
- */
 export function extractUsers(chatData: ChatData): User[] {
   return chatData.map((chat) => ({
     id: chat.user,
@@ -35,15 +25,6 @@ export function extractUsers(chatData: ChatData): User[] {
   }));
 }
 
-/**
- * Генерирует комплексную статистику для конкретного пользователя.
- * Включает:
- * - Общее количество сообщений
- * - Распределение сообщений по отправителям
- * - Наиболее часто используемые слова (за исключением URL)
- * - Статистика активности по датам
- * - Среднее количество сообщений в день за весь период общения
- */
 export function generateUserStats(chatData: ChatData, userId: string): UserStats | null {
   const userChat = chatData.find((chat) => chat.user === userId);
   if (!userChat) return null;
@@ -68,8 +49,6 @@ export function generateUserStats(chatData: ChatData, userId: string): UserStats
     "Вечер (18:00-00:00)": 0,
     "Ночь (00:00-6:00)": 0,
   };
-
-  // Используем готовый Set из модуля stopWords (создан один раз при загрузке)
 
   userChat.messages.forEach((msg) => {
     if (!msg.text) return;

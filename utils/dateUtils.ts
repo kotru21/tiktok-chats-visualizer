@@ -1,12 +1,5 @@
-/**
- * Датовые утилиты: день недели, время суток, форматирование.
- * Без внешних зависимостей - используем встроенный Date API.
- */
 import type { WeekdayName, TimeOfDayBucket } from "../types/date.js";
 
-/**
- * Названия дней недели (индекс 0 = Воскресенье, как в Date.getDay())
- */
 export const weekdayNames: readonly string[] = [
   "Воскресенье",
   "Понедельник",
@@ -17,9 +10,6 @@ export const weekdayNames: readonly string[] = [
   "Суббота",
 ] as const;
 
-/**
- * Временные интервалы суток с диапазонами часов
- */
 export const timeOfDayBuckets: Record<TimeOfDayBucket, readonly [number, number]> = {
   "Утро (6:00-12:00)": [6, 12],
   "День (12:00-18:00)": [12, 18],
@@ -27,16 +17,10 @@ export const timeOfDayBuckets: Record<TimeOfDayBucket, readonly [number, number]
   "Ночь (00:00-6:00)": [0, 6],
 } as const;
 
-/**
- * Возвращает название дня недели для даты.
- */
 export function getWeekdayName(date: Date): WeekdayName {
   return weekdayNames[date.getDay()] as WeekdayName;
 }
 
-/**
- * Возвращает временной интервал суток для даты.
- */
 export function getTimeOfDayBucket(date: Date): TimeOfDayBucket {
   const hour = date.getHours();
   if (hour >= 6 && hour < 12) return "Утро (6:00-12:00)";
@@ -45,9 +29,6 @@ export function getTimeOfDayBucket(date: Date): TimeOfDayBucket {
   return "Ночь (00:00-6:00)";
 }
 
-/**
- * Форматирует timestamp в ISO формат даты (YYYY-MM-DD).
- */
 export function formatDateISO(ts: string | Date): string {
   const date = typeof ts === "string" ? new Date(ts) : ts;
   const year = date.getFullYear();
@@ -56,9 +37,6 @@ export function formatDateISO(ts: string | Date): string {
   return `${year}-${month}-${day}`;
 }
 
-/**
- * Форматирует дату для отображения (DD.MM.YYYY).
- */
 export function formatDisplayDate(date: string | Date): string {
   const d = typeof date === "string" ? new Date(date) : date;
   const day = String(d.getDate()).padStart(2, "0");

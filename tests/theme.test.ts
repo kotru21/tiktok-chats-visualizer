@@ -1,21 +1,17 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 
-// happy-dom регистрируется в tests/setup.ts через bunfig.toml preload
-
 interface SetupDomOptions {
   prefersDark?: boolean;
   storedTheme?: string | null;
 }
 
-// Хелпер для настройки окна и документа
 function setupDom({ prefersDark = false, storedTheme = null }: SetupDomOptions = {}): void {
-  // Сбрасываем состояние
+  document.documentElement.className = "";
   document.body.className = "";
   localStorage.clear();
 
   if (storedTheme) localStorage.setItem("theme", storedTheme);
 
-  // matchMedia заглушка
   window.matchMedia = ((query: string) => ({
     matches: query.includes("dark") ? prefersDark : false,
     media: query,
@@ -30,7 +26,6 @@ function setupDom({ prefersDark = false, storedTheme = null }: SetupDomOptions =
 
 describe("theme", () => {
   beforeEach(() => {
-    // Очищаем кеш модуля перед каждым тестом
     const modulePath = require.resolve("../public/js/theme.js");
     Reflect.deleteProperty(require.cache, modulePath);
   });
@@ -49,11 +44,11 @@ describe("theme", () => {
     const { applyTheme } = await import("../public/js/theme.js");
 
     applyTheme("dark");
-    expect(document.body.classList.contains("dark-theme")).toBe(true);
+    expect(document.documentElement.classList.contains("dark-theme")).toBe(true);
     expect(localStorage.getItem("theme")).toBe("dark");
 
     applyTheme("light");
-    expect(document.body.classList.contains("dark-theme")).toBe(false);
+    expect(document.documentElement.classList.contains("dark-theme")).toBe(false);
     expect(localStorage.getItem("theme")).toBe("light");
   });
 

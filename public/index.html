@@ -4,29 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Анализатор чатов TikTok</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="css/style.css" />
     <meta name="color-scheme" content="light dark" />
   </head>
   <body>
     <div class="app-container">
-      <!-- Мобильная навигация -->
       <div class="mobile-header">
         <h1>Анализатор чатов</h1>
-        <button id="sidebar-toggle" class="hidden" aria-label="Открыть список пользователей">
-          <span class="hamburger"></span>
-        </button>
+        <div class="mobile-header-actions">
+          <button type="button" class="theme-toggle" aria-label="Тема"></button>
+          <button id="sidebar-toggle" class="hidden" aria-label="Открыть список пользователей">
+            <span class="hamburger"></span>
+          </button>
+        </div>
       </div>
 
-      <!-- Боковая панель с пользователями -->
       <aside class="sidebar hidden" id="sidebar">
         <div class="sidebar-header">
-          <h2>Пользователи</h2>
+          <div class="sidebar-header-row">
+            <h2>Пользователи</h2>
+            <button type="button" class="theme-toggle" aria-label="Тема"></button>
+          </div>
           <div class="search-container">
             <input
               type="text"
@@ -37,7 +35,6 @@
           </div>
         </div>
         <div class="user-list" id="userList">
-          <!-- Список пользователей будет загружен с сервера -->
           <div class="loading">
             <div class="spinner"></div>
             <span>Загрузка пользователей...</span>
@@ -45,9 +42,7 @@
         </div>
       </aside>
 
-      <!-- Основной контент -->
       <main class="main-content">
-        <!-- Приветственный экран -->
         <div id="welcome-message" class="welcome-screen">
           <div class="welcome-content">
             <div id="upload-container" class="upload-container">
@@ -114,7 +109,6 @@
           </div>
 
           <div class="stats-cards">
-            <!-- Общая статистика -->
             <div class="stat-card full-width-card">
               <div class="card-header">
                 <h3>
@@ -128,7 +122,6 @@
               </div>
             </div>
 
-            <!-- Сообщения по авторам -->
             <div class="stat-card">
               <div class="card-header">
                 <h3>Сообщения по авторам</h3>
@@ -158,7 +151,6 @@
               </div>
             </div>
 
-            <!-- Частые сочетания слов (новая карточка) -->
             <div class="stat-card">
               <div class="card-header">
                 <h3>Частые сочетания слов</h3>
@@ -188,7 +180,6 @@
               </div>
             </div>
 
-            <!-- Активность по дням недели -->
             <div class="stat-card">
               <div class="card-header">
                 <h3>Активность по дням недели</h3>
@@ -203,7 +194,6 @@
               </div>
             </div>
 
-            <!-- Активность по времени суток -->
             <div class="stat-card">
               <div class="card-header">
                 <h3>Активность по времени суток</h3>
@@ -216,6 +206,13 @@
                   Загрузка...
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div id="user-stats-fetch-overlay" class="user-stats-fetch-overlay" aria-hidden="true">
+            <div class="user-stats-fetch-overlay-inner">
+              <div class="spinner"></div>
+              <span>Загрузка…</span>
             </div>
           </div>
         </div>

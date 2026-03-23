@@ -2,40 +2,25 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 
 export default defineConfig({
-  // Корневая директория для Vite - public
   root: "public",
-
-  // Базовый путь для продакшена
   base: "/",
-
-  // Настройки dev-сервера
   server: {
     port: 3000,
     strictPort: false,
     open: true,
   },
-
-  // Настройки Worker
   worker: {
     format: "es",
   },
-
-  // Настройки сборки
   build: {
-    // Директория вывода относительно корня проекта
     outDir: "../dist/client",
     emptyOutDir: true,
-
-    // Генерация source maps для отладки
     sourcemap: true,
-
-    // Rollup настройки
     rollupOptions: {
       input: {
         main: resolve(__dirname, "public/index.html"),
       },
       output: {
-        // Структура выходных файлов
         entryFileNames: "js/[name]-[hash].js",
         chunkFileNames: "js/[name]-[hash].js",
         assetFileNames: (assetInfo) => {
@@ -47,20 +32,14 @@ export default defineConfig({
         },
       },
     },
-
-    // Минимальная поддержка браузеров
     target: "es2021",
   },
-
-  // Резолв алиасов путей
   resolve: {
     alias: {
       "@": resolve(__dirname, "public/js"),
       "@types": resolve(__dirname, "types"),
     },
   },
-
-  // Оптимизация зависимостей
   optimizeDeps: {
     include: ["chart.js"],
   },

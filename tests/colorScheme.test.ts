@@ -1,18 +1,14 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 
-// happy-dom регистрируется в tests/setup.ts через bunfig.toml preload
-
 interface SetupDomOptions {
   darkPreferred?: boolean;
   hasDarkClass?: boolean;
 }
 
-// Хелпер для настройки окна и документа
 function setupDom({ darkPreferred = false, hasDarkClass = false }: SetupDomOptions = {}): void {
-  // Сбрасываем состояние
   document.body.className = "";
+  document.documentElement.className = hasDarkClass ? "dark-theme" : "";
 
-  // имитируем matchMedia
   window.matchMedia = ((query: string) => ({
     matches: query.includes("dark") ? darkPreferred : false,
     media: query,
@@ -23,13 +19,10 @@ function setupDom({ darkPreferred = false, hasDarkClass = false }: SetupDomOptio
     dispatchEvent: () => true,
     onchange: null,
   })) as typeof window.matchMedia;
-
-  if (hasDarkClass) document.body.classList.add("dark-theme");
 }
 
 describe("charts/colorScheme", () => {
   beforeEach(() => {
-    // Очищаем кеш модуля перед каждым тестом
     const modulePath = require.resolve("../public/js/charts/colorScheme.js");
     Reflect.deleteProperty(require.cache, modulePath);
   });
@@ -42,7 +35,7 @@ describe("charts/colorScheme", () => {
 
     invalidateChartColorCache();
     const scheme = getChartColorScheme();
-    expect(scheme.fontColor).toBe("#333");
+    expect(scheme.fontColor).toBe("#0a0a0a");
   });
 
   it("должен переключаться на тёмную схему при классе dark-theme", async () => {
@@ -53,6 +46,6 @@ describe("charts/colorScheme", () => {
 
     invalidateChartColorCache();
     const scheme = getChartColorScheme();
-    expect(scheme.fontColor).toBe("#e1e1e1");
+    expect(scheme.fontColor).toBe("#fafafa");
   });
 });

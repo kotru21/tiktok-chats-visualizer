@@ -33,7 +33,7 @@ export function createWordPairsChart(
         {
           label: "Частота использования",
           data: values,
-          backgroundColor: "#69c9d0",
+          backgroundColor: colorScheme.barSecondary,
           borderWidth: 1,
         },
       ],

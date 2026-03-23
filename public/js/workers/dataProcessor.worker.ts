@@ -1,10 +1,3 @@
-/**
- * Web Worker для обработки данных чатов TikTok.
- * Выполняет тяжёлые вычисления в отдельном потоке, не блокируя UI.
- */
-
-// === Типы ===
-
 interface ChatMessage {
   timestamp: string;
   from: string;
@@ -89,8 +82,6 @@ interface TikTokExport {
   };
 }
 
-// === Сообщения Worker ===
-
 interface WorkerMessage {
   type: "parse" | "getUsers" | "getUserStats";
   payload?: unknown;
@@ -102,8 +93,6 @@ interface WorkerResponse {
   payload: unknown;
   id: number;
 }
-
-// === Стоп-слова ===
 
 const baseStopWords: readonly string[] = [
   "это",
@@ -140,8 +129,6 @@ const additionalStopWords: readonly string[] = [
 ] as const;
 
 const stopWordsSet: ReadonlySet<string> = new Set([...baseStopWords, ...additionalStopWords]);
-
-// === Текстовые утилиты ===
 
 function removeUrls(text: string): string {
   return text
@@ -186,8 +173,6 @@ function getBigrams(words: string[]): string[] {
   return pairs;
 }
 
-// === Датовые утилиты (без moment.js) ===
-
 const weekdayNames: readonly string[] = [
   "Воскресенье",
   "Понедельник",
@@ -226,8 +211,6 @@ function formatDisplayDate(date: string | Date): string {
   return `${day}.${month}.${year}`;
 }
 
-// === Статистические утилиты ===
-
 function countByAuthor(messages: ChatMessage[]): FrequencyMap {
   const map: FrequencyMap = {};
   for (const m of messages) {
@@ -237,11 +220,7 @@ function countByAuthor(messages: ChatMessage[]): FrequencyMap {
   return map;
 }
 
-// === Хранилище данных в Worker ===
-
 let chatData: ChatData | null = null;
-
-// === Основные функции обработки ===
 
 function parseFile(fileContent: string): { success: boolean; count: number; message: string } {
   try {
@@ -403,8 +382,6 @@ function generateUserStats(userId: string): UserStats | null {
     },
   };
 }
-
-// === Обработчик сообщений ===
 
 self.onmessage = (e: MessageEvent<WorkerMessage>): void => {
   const { type, payload, id } = e.data;

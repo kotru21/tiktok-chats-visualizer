@@ -1,15 +1,45 @@
+import "@fontsource-variable/geist/index.css";
+import "@fontsource-variable/geist-mono/index.css";
 import { setupUploader } from "./uploader.js";
 import { getUsers, getUserStats } from "./api.js";
 import { renderUserList, filterUserList } from "./ui/userList.js";
 import { renderStats } from "./ui/statsView.js";
 import { debounce } from "./utils/performance.js";
-import "./theme.js"; // применяет тему при загрузке
+import { toggleTheme } from "./theme.js";
+
+const ICON_MOON =
+  "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/></svg>";
+
+const ICON_SUN =
+  "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/></svg>";
+
+const OVERLAY_SHOW_DELAY_MS = 100;
+
+function doubleRaf(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
+
+function syncThemeToggleIcons(): void {
+  const dark = document.documentElement.classList.contains("dark-theme");
+  const icon = dark ? ICON_SUN : ICON_MOON;
+  const label = dark ? "Включить светлую тему" : "Включить тёмную тему";
+  document.querySelectorAll(".theme-toggle").forEach((btn) => {
+    btn.setAttribute("aria-label", label);
+    btn.innerHTML = icon;
+  });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
+  syncThemeToggleIcons();
+  window.addEventListener("theme:changed", () => syncThemeToggleIcons());
+
   setupUploader({ onUploaded: loadUsers });
   setupEventListeners();
 
-  // загрузка списка пользователей
   async function loadUsers(): Promise<void> {
     try {
       const users = await getUsers();
@@ -30,53 +60,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // функция для загрузки статистики пользователя
   async function loadUserStats(userId: string): Promise<void> {
+    const welcomeMessage = document.getElementById("welcome-message");
+    const userStats = document.getElementById("user-stats");
+    const overlay = document.getElementById("user-stats-fetch-overlay");
+    const userName = document.getElementById("user-name");
+
+    if (welcomeMessage) welcomeMessage.style.display = "none";
+    if (userStats) userStats.style.display = "block";
+    if (userName) userName.textContent = userId;
+
+    const showOverlayTimer = window.setTimeout(() => {
+      overlay?.classList.add("is-visible");
+      overlay?.setAttribute("aria-hidden", "false");
+    }, OVERLAY_SHOW_DELAY_MS);
+    userStats?.setAttribute("aria-busy", "true");
+
     try {
-      // отображение информации о загрузке
-      const welcomeMessage = document.getElementById("welcome-message");
-      const userStats = document.getElementById("user-stats");
-      const userName = document.getElementById("user-name");
-
-      if (welcomeMessage) welcomeMessage.style.display = "none";
-      if (userStats) userStats.style.display = "block";
-      if (userName) userName.textContent = userId;
-
-      // очистка предыдущих данных
-      const generalStats = document.getElementById("general-stats");
-      const messagesByAuthor = document.getElementById("messages-by-author");
-      const frequentWords = document.getElementById("frequent-words");
-      const dateActivity = document.getElementById("date-activity");
-      const weekdayActivity = document.getElementById("weekday-activity");
-      const timeOfDayActivity = document.getElementById("time-of-day-activity");
-
-      if (generalStats) {
-        generalStats.innerHTML = "<div class=\"loading\">Загрузка статистики...</div>";
-      }
-      if (messagesByAuthor) {
-        messagesByAuthor.innerHTML =
-          "<canvas id=\"author-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
-      }
-      if (frequentWords) {
-        frequentWords.innerHTML =
-          "<canvas id=\"words-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
-      }
-      if (dateActivity) {
-        dateActivity.innerHTML =
-          "<canvas id=\"date-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
-      }
-      if (weekdayActivity) {
-        weekdayActivity.innerHTML =
-          "<canvas id=\"weekday-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
-      }
-      if (timeOfDayActivity) {
-        timeOfDayActivity.innerHTML =
-          "<canvas id=\"time-of-day-chart\"></canvas><div class=\"loading\">Загрузка...</div>";
-      }
-
-      // загрузка статистики
       const stats = await getUserStats(userId);
       displayUserStats(stats);
+      await doubleRaf();
     } catch (error) {
       console.error("Ошибка:", error);
       const generalStats = document.getElementById("general-stats");
@@ -84,17 +87,19 @@ document.addEventListener("DOMContentLoaded", () => {
         generalStats.innerHTML =
           "<div class=\"error\">Ошибка при загрузке статистики. Пожалуйста, попробуйте позже.</div>";
       }
+    } finally {
+      clearTimeout(showOverlayTimer);
+      overlay?.classList.remove("is-visible");
+      overlay?.setAttribute("aria-hidden", "true");
+      userStats?.setAttribute("aria-busy", "false");
     }
   }
 
-  // функция для отображения статистики пользователя
   function displayUserStats(stats: Awaited<ReturnType<typeof getUserStats>>): void {
     renderStats(stats);
   }
 
-  // настройка обработчиков событий
   function setupEventListeners(): void {
-    // мобильное меню
     const sidebarToggle = document.getElementById("sidebar-toggle");
     const sidebar = document.getElementById("sidebar");
 
@@ -104,7 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // кнопка "Назад" на мобильных устройствах
     const backButton = document.getElementById("back-to-list");
     if (backButton) {
       backButton.addEventListener("click", () => {
@@ -116,7 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // закрытие сайдбара при клике на основной контент на мобильных
     const mainContent = document.querySelector(".main-content");
     if (mainContent) {
       mainContent.addEventListener("click", () => {
@@ -126,7 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // поиск по пользователям с debounce для оптимизации
     const searchInput = document.getElementById("user-search") as HTMLInputElement | null;
     if (searchInput) {
       const debouncedFilter = debounce((value: string) => {
@@ -135,5 +137,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       searchInput.addEventListener("input", () => debouncedFilter(searchInput.value));
     }
+
+    document.querySelectorAll(".theme-toggle").forEach((btn) => {
+      btn.addEventListener("click", () => toggleTheme());
+    });
   }
 });
