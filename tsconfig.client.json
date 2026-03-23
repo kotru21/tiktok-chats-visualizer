@@ -17,6 +17,6 @@
     "allowJs": true,
     "checkJs": false
   },
-  "include": ["public/js/**/*.ts", "types/**/*.ts", "types/**/*.d.ts"],
+  "include": ["public/js/**/*.ts", "types/**/*.ts", "types/**/*.d.ts", "utils/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

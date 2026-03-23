@@ -25,16 +25,31 @@ export interface UploadResult {
 
 export type UsersResponse = User[];
 
-export interface TikTokDataExport {
-  "Direct Messages"?: {
-    "Chat History"?: {
+export interface TikTokChatEntry {
+  Date: string;
+  From: string;
+  Content?: string | null;
+}
+
+/**
+ * TikTok data export JSON may use either nesting (observed in app parser) or alternate keys.
+ * Parser accepts both — see `utils/tiktokExportParse.ts`.
+ */
+export interface TikTokExportDirectMessage {
+  "Direct Message"?: {
+    "Direct Messages"?: {
       ChatHistory?: Record<string, TikTokChatEntry[]>;
     };
   };
 }
 
-export interface TikTokChatEntry {
-  Date: string;
-  From: string;
-  Content?: string;
+export interface TikTokExportDirectMessagesBlock {
+  "Direct Messages"?: {
+    "Chat History"?: {
+      ChatHistory?: Record<string, TikTokChatEntry[]>;
+    };
+    ChatHistory?: Record<string, TikTokChatEntry[]>;
+  };
 }
+
+export type TikTokDataExport = TikTokExportDirectMessage & TikTokExportDirectMessagesBlock;

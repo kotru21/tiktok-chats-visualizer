@@ -12,17 +12,28 @@ export function renderUserList(
     container.innerHTML = "<div class=\"no-data\">Пользователи не найдены</div>";
     return;
   }
+  container.replaceChildren();
   container.setAttribute("role", "listbox");
   container.setAttribute("aria-label", "Список пользователей");
-  container.innerHTML = users
-    .map(
-      (user) => `
-        <div class="user-item" data-user-id="${user.id}" role="option" tabindex="0">
-          <div class="user-name">${user.name}</div>
-          <div class="user-message-count">${user.messageCount} сообщений</div>
-        </div>`
-    )
-    .join("");
+
+  for (const user of users) {
+    const item = document.createElement("div");
+    item.className = "user-item";
+    item.dataset.userId = user.id;
+    item.setAttribute("role", "option");
+    item.setAttribute("tabindex", "0");
+
+    const nameEl = document.createElement("div");
+    nameEl.className = "user-name";
+    nameEl.textContent = user.name;
+
+    const countEl = document.createElement("div");
+    countEl.className = "user-message-count";
+    countEl.textContent = `${user.messageCount} сообщений`;
+
+    item.append(nameEl, countEl);
+    container.append(item);
+  }
 
   container.querySelectorAll(".user-item").forEach((item) => {
     item.addEventListener("click", function (this: HTMLElement) {
@@ -32,7 +43,7 @@ export function renderUserList(
       });
       this.classList.add("active");
       this.setAttribute("aria-selected", "true");
-      const userId = this.getAttribute("data-user-id");
+      const userId = this.dataset.userId;
       if (userId) onSelect(userId);
     });
   });
@@ -79,7 +90,7 @@ export function renderUserList(
             });
             el.classList.add("active");
             el.setAttribute("aria-selected", "true");
-            const userId = el.getAttribute("data-user-id");
+            const userId = el.dataset.userId;
             if (userId) onSelect(userId);
           }
         }

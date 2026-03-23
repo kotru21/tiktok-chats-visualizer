@@ -17,6 +17,11 @@ export const timeOfDayBuckets: Record<TimeOfDayBucket, readonly [number, number]
   "Ночь (00:00-6:00)": [0, 6],
 } as const;
 
+/** True if `Date` is not Invalid Date (`getTime()` is finite). */
+export function isValidCalendarDate(date: Date): boolean {
+  return !Number.isNaN(date.getTime());
+}
+
 export function getWeekdayName(date: Date): WeekdayName {
   return weekdayNames[date.getDay()] as WeekdayName;
 }

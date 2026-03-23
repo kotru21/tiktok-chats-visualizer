@@ -54,8 +54,10 @@ export function generateUserStats(chatData: ChatData, userId: string): UserStats
     if (!msg.text) return;
 
     const date = new Date(msg.timestamp);
-    messagesByWeekday[getWeekdayName(date)]++;
-    messagesByTimeOfDay[getTimeOfDayBucket(date)]++;
+    if (!Number.isNaN(date.getTime())) {
+      messagesByWeekday[getWeekdayName(date)]++;
+      messagesByTimeOfDay[getTimeOfDayBucket(date)]++;
+    }
 
     let text = removeUrls(msg.text);
     if (text.trim() === "") return;
@@ -74,9 +76,10 @@ export function generateUserStats(chatData: ChatData, userId: string): UserStats
     }
   });
 
+  const wordKeyCount = Object.keys(words).length;
   const frequentWords: WordFrequency[] = Object.entries(words)
     .sort((a, b) => b[1] - a[1])
-    .filter(([, count]) => (Object.keys(words).length >= 20 ? count > 1 : true))
+    .filter(([, count]) => (wordKeyCount >= 20 ? count > 1 : true))
     .slice(0, 20)
     .map(([word, count]) => ({ word, count }));
 
@@ -88,8 +91,10 @@ export function generateUserStats(chatData: ChatData, userId: string): UserStats
 
   const messagesByDate: FrequencyMap = {};
   userChat.messages.forEach((msg) => {
-    const d = formatDateISO(msg.timestamp);
-    messagesByDate[d] = (messagesByDate[d] ?? 0) + 1;
+    const d = new Date(msg.timestamp);
+    if (Number.isNaN(d.getTime())) return;
+    const key = formatDateISO(d);
+    messagesByDate[key] = (messagesByDate[key] ?? 0) + 1;
   });
 
   const dateStats: DateStat[] = Object.entries(messagesByDate)
@@ -101,10 +106,20 @@ export function generateUserStats(chatData: ChatData, userId: string): UserStats
   let lastDate: Date | null = null;
 
   if (userChat.messages.length > 0) {
-    const timestamps = userChat.messages.map((m) => new Date(m.timestamp).getTime());
-    firstDate = new Date(Math.min(...timestamps));
-    lastDate = new Date(Math.max(...timestamps));
-    totalDays = Math.floor((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    let minT = Infinity;
+    let maxT = -Infinity;
+    for (const m of userChat.messages) {
+      const t = new Date(m.timestamp).getTime();
+      if (Number.isFinite(t)) {
+        if (t < minT) minT = t;
+        if (t > maxT) maxT = t;
+      }
+    }
+    if (minT !== Infinity && maxT !== -Infinity) {
+      firstDate = new Date(minT);
+      lastDate = new Date(maxT);
+      totalDays = Math.floor((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    }
   }
 
   const firstDateFormatted = firstDate ? formatDisplayDate(firstDate) : "Н/Д";

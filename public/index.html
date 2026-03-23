@@ -2,15 +2,98 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var dark =
+            stored === "dark" ||
+            (stored !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark-theme");
+        } catch (_) {}
+      })();
+    </script>
+    <style>
+      html.dark-theme {
+        color-scheme: dark;
+      }
+      html.dark-theme body {
+        background-color: #000000;
+        color: #fafafa;
+      }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Анализатор чатов TikTok</title>
+    <title>Анализатор чатов TikTok — статистика переписки из JSON в браузере</title>
+    <meta
+      name="description"
+      content="Бесплатный анализ экспорта Direct Messages TikTok: загрузите JSON выгрузки, смотрите графики по словам, датам и активности. Данные не отправляются на сервер — только в вашем браузере."
+    />
+    <meta
+      name="keywords"
+      content="TikTok, чат, переписка, анализ, статистика, Direct Messages, JSON, экспорт данных, визуализация, приватность"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="kotru21" />
+    <link rel="canonical" href="/" />
+    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="Анализатор чатов TikTok" />
+    <meta
+      property="og:title"
+      content="Анализатор чатов TikTok — статистика переписки из JSON"
+    />
+    <meta
+      property="og:description"
+      content="Анализ выгрузки Direct Messages: слова, даты, активность. Обработка локально в браузере, без загрузки чатов на сервер."
+    />
+
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="twitter:title"
+      content="Анализатор чатов TikTok — статистика переписки из JSON"
+    />
+    <meta
+      name="twitter:description"
+      content="Анализ выгрузки Direct Messages в браузере: графики, слова, активность. Данные не уходят на сервер."
+    />
+
+    <link rel="icon" href="assets/ktkv-logo.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/ktkv-logo.svg" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Анализатор чатов TikTok",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Web",
+        "browserRequirements": "Требуется современный браузер с JavaScript",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "RUB"
+        },
+        "description": "Веб-приложение для анализа и визуализации истории чатов из JSON-экспорта TikTok Direct Messages. Статистика по сообщениям, словам и активности; обработка данных локально в браузере.",
+        "inLanguage": "ru-RU",
+        "author": {
+          "@type": "Person",
+          "name": "kotru21",
+          "url": "https://ktkv.me/"
+        },
+        "sameAs": ["https://github.com/kotru21/tiktok-chats-visualizer"]
+      }
+    </script>
+
     <link rel="stylesheet" href="css/style.css" />
     <meta name="color-scheme" content="light dark" />
   </head>
   <body>
     <div class="app-container">
       <div class="mobile-header">
-        <h1>Анализатор чатов</h1>
+        <p class="mobile-header-title">Анализатор чатов</p>
         <div class="mobile-header-actions">
           <button type="button" class="theme-toggle" aria-label="Тема"></button>
           <button id="sidebar-toggle" class="hidden" aria-label="Открыть список пользователей">
@@ -45,18 +128,55 @@
       <main class="main-content">
         <div id="welcome-message" class="welcome-screen">
           <div class="welcome-content">
-            <div id="upload-container" class="upload-container">
-              <h2>Загрузите ваш файл данных TikTok</h2>
-              <p class="upload-info">
-                Для анализа необходим файл JSON, полученный из запроса на выгрузку данных в TikTok.
-                Данные загружаются на сервер и не сохраняются (анонимная сессия).
+            <header class="welcome-header">
+              <p class="welcome-eyebrow">Выгрузка TikTok · только в браузере</p>
+              <h1 class="welcome-title">Анализ переписки</h1>
+              <p class="welcome-lead">
+                Статистика по сообщениям, словам и активности — из JSON-файла Direct Messages, без
+                отправки данных в интернет.
               </p>
-              <form id="upload-form" enctype="multipart/form-data">
+            </header>
+
+            <section
+              id="upload-container"
+              class="upload-container welcome-upload-panel"
+              aria-labelledby="upload-heading"
+            >
+              <h2 id="upload-heading" class="welcome-section-title">Загрузка файла</h2>
+              <p class="upload-info">
+                Нужен файл <code class="welcome-code">.json</code> из запроса персональных данных в
+                TikTok. Обработка полностью локальная: сервер не используется, содержимое чатов
+                никуда не передаётся.
+              </p>
+              <form id="upload-form" class="welcome-upload-form" enctype="multipart/form-data">
                 <div class="file-input-container">
                   <input type="file" id="chat-file" name="chatFile" accept=".json" required />
                   <label for="chat-file" class="file-label">
-                    <span class="file-icon">📁</span>
-                    <span class="file-text">Выберите JSON файл</span>
+                    <span class="file-icon" aria-hidden="true">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" x2="8" y1="13" y2="13" />
+                        <line x1="16" x2="8" y1="17" y2="17" />
+                        <line x1="10" x2="8" y1="9" y2="9" />
+                      </svg>
+                    </span>
+                    <span class="file-text-wrap">
+                      <span class="file-text file-text-primary">Выберите или перетащите JSON</span>
+                      <span class="file-text-hint">В идеале до нескольких десятков МБ</span>
+                    </span>
                   </label>
                 </div>
               </form>
@@ -67,33 +187,51 @@
                 aria-live="polite"
                 aria-busy="false"
               ></div>
-            </div>
-            <svg
-              class="welcome-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="80"
-              height="80"
-            >
-              <path fill="none" d="M0 0h24v24H0z" />
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"
-                fill="currentColor"
-              />
-            </svg>
-            <h2>Добро пожаловать в Анализатор чатов!</h2>
-            <p>
-              Выберите пользователя из списка слева, чтобы увидеть подробную статистику вашего
-              общения.
-            </p>
-            <p class="welcome-tip">Вы сможете узнать:</p>
-            <ul class="welcome-features">
-              <li>Общее количество и среднее число сообщений</li>
-              <li>Распределение сообщений между участниками</li>
-              <li>Наиболее часто используемые слова</li>
-              <li>Активность общения по дням</li>
-            </ul>
+            </section>
+
+            <div class="welcome-divider welcome-span-full" role="presentation"></div>
+
+            <section class="welcome-next welcome-span-full" aria-labelledby="next-heading">
+              <div class="welcome-next-grid">
+                <div class="welcome-next-copy">
+                  <h2 id="next-heading" class="welcome-section-title">Дальше</h2>
+                  <p class="welcome-next-lead">
+                    После загрузки откройте список слева и выберите собеседника — откроется
+                    статистика по вашему чату с ним.
+                  </p>
+                </div>
+                <div class="welcome-next-list-block">
+                  <p class="welcome-tip">Можно посмотреть:</p>
+                  <ul class="welcome-features">
+                    <li>объём переписки и сообщений в день</li>
+                    <li>доли сообщений по авторам</li>
+                    <li>частые слова и устойчивые сочетания</li>
+                    <li>активность по датам, дням недели и времени суток</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
           </div>
+
+          <footer class="welcome-footer">
+            <a
+              class="welcome-author-link"
+              href="https://ktkv.me"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Сайт автора — ktkv.me"
+            >
+              <img
+                class="welcome-author-logo"
+                src="assets/ktkv-logo.svg"
+                width="28"
+                height="28"
+                alt=""
+                decoding="async"
+              />
+              <span class="welcome-author-text">Мой сайт — ktkv.me</span>
+            </a>
+          </footer>
         </div>
 
         <!-- Статистика пользователя -->
